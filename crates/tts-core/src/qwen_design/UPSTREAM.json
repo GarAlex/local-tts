@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/wavekat/wavekat-tts",
+  "revision": "ad3c7d0f927370ab23e1afad176c3cccff51467a",
+  "license": "Apache-2.0",
+  "original_sha256": {
+    "model.rs": "a6cd96f0520b31af9686f5b8a3171e1ca442dcad13061cc01f8eee395e660847",
+    "tokenizer.rs": "31695149b541b412e23f62eb077489ebfde10bd27c52b41b2b668cedd5c2033e",
+    "sampler.rs": "77c7a9e3d69399bbd8f2023a432d3678612d2a6d0af6bfca3a81429d94131286"
+  },
+  "modifications": [
+    "native Audio type",
+    "fixed CPU INT4 runtime",
+    "bounded cancellable decoding",
+    "pinned JSON tokenizer",
+    "offline-only asset verification",
+    "strict native reader for pinned NPY v1 f32 arrays; no npyz dependency"
+  ]
+}

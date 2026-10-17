@@ -1,0 +1,18 @@
+[package]
+name = "tts-studio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Local TTS Studio: egui desktop app for testing voices and training your own"
+
+[dependencies]
+local-tts-core = { path = "../tts-core" }
+eframe = "0.33"
+rfd = "0.15"
+rodio = { version = "0.20", default-features = false }
+serde_json.workspace = true
+serde.workspace = true
+cpal = "0.15"
+sha2 = "0.10"
+tempfile = "3"

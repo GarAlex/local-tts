@@ -1,0 +1,58 @@
+{
+  "repository": "alphacep/vosk-tts-ru-multi",
+  "revision": "0960eb904b9035a9fdbba2882933a4f5a84c525f",
+  "files": {
+    "G_1000.pth": {
+      "url": "https://huggingface.co/alphacep/vosk-tts-ru-multi/resolve/0960eb904b9035a9fdbba2882933a4f5a84c525f/G_1000.pth",
+      "sha256": "8c525a91f0c8b0ff7dbbb40764724a68d6a3627cad9d04339cc66490f4b054e2",
+      "size": 167905738
+    },
+    "config.json": {
+      "url": "https://huggingface.co/alphacep/vosk-tts-ru-multi/resolve/0960eb904b9035a9fdbba2882933a4f5a84c525f/config.json",
+      "sha256": "02df8fd7cdf4d72f1a1397faeee940dc4078c6a2d6860f272473a6953450c5c7",
+      "size": 2088
+    },
+    "README.md": {
+      "url": "https://huggingface.co/alphacep/vosk-tts-ru-multi/resolve/0960eb904b9035a9fdbba2882933a4f5a84c525f/README.md",
+      "sha256": "cc39b3f69ccd0569ec99f9ae2d643740ce8198309e5ed207fc9892d96b892e01",
+      "size": 464
+    },
+    "SOURCE-LICENSE": {
+      "url": "https://raw.githubusercontent.com/alphacep/vosk-tts/b492223c8747a24499e4c1ae905800e85ab887b4/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "size": 11357
+    },
+    "SOURCE-MB-VITS-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/FENRlR/MB-iSTFT-VITS2/a1fef37b0d2fd35b5d588c6862f94e7be27b6408/LICENSE",
+      "sha256": "6571764afe6361eb24f5ce3a793a677a661d032e97d9c814e764a0ef96033b5e",
+      "size": 1063
+    },
+    "SOURCE-PQMF-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/kan-bayashi/ParallelWaveGAN/de8efa831f7c68b2db223a07e817505afa9fead1/LICENSE",
+      "sha256": "57760517a3a895ff36d4feb6a7c133b90a07e0b39ac064dd99fa21b003a9040d",
+      "size": 1123
+    },
+    "SOURCE-STFT-LICENSE.txt": {
+      "sha256": "c3fc19475437be0832d3d60648af1c6503052085b91a92fe37448be025b30f71",
+      "size": 1514,
+      "url": "embedded:training/vendor/vosk/stft.py"
+    }
+  },
+  "schema_version": 1,
+  "id": "vosk-ru-multi-0.7",
+  "language": "ru",
+  "source_revision": "b492223c8747a24499e4c1ae905800e85ab887b4",
+  "speakers": {
+    "F01": 0,
+    "F02": 1,
+    "F03": 2,
+    "M01": 3,
+    "M02": 4
+  },
+  "license": "Publisher model card declares Apache-2.0; source Apache-2.0 with MIT/BSD notices",
+  "provenance_limits": [
+    "Dictionary and underlying source recordings/consent/derived voice lineage remain unverified.",
+    "Publisher ONNX inverse-STFT lacks overlap normalization; our export matches the normalized training waveform.",
+    "Fresh waveform and duration discriminators on adaptation; publisher only supplies the generator."
+  ]
+}

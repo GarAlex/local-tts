@@ -1,0 +1,26 @@
+[
+  {
+    "repository": "https://github.com/Signalsmith-Audio/signalsmith-stretch",
+    "revision": "a670068d9aeb64913331d5cc29337b19a457a7df",
+    "files": {
+      "LICENSE.txt": "ee2ef82481ffb445ecdd4b3a4c1f82c0cddb2da8fe39d8e8dc384fffb3e7f06f",
+      "signalsmith-stretch.h": "1188667959ac19dd40c0a6abbce694e44705615ec4f0e8db8af0f1cfb4c5dea7"
+    }
+  },
+  {
+    "repository": "https://github.com/Signalsmith-Audio/linear",
+    "revision": "de55e6a50ffcf6f8f43f649692d94691c7025151",
+    "files": {
+      "LICENSE.txt": "072b5e9eb5b22880bdf6256324654cf3ce53dba828edb911921121e1be09d9c3",
+      "include/signalsmith-linear/approx.h": "55c090c621657ee1fbe23a8c582811e103acf8ba10263c4a6d9b66a62809fa1a",
+      "include/signalsmith-linear/fft.h": "98e7e64093b6fc8ccbba31f710370d5548243bad35beb489e8282de4dc25d76d",
+      "include/signalsmith-linear/linear.h": "5c5d55810af0b7f8c8fe27ef1a36a87a4529f95cbebbb5e49f39845f6a2a0d5e",
+      "include/signalsmith-linear/stft.h": "a323656e5ed80b271262106ea782d6150ef2f1c8b2f3c5896552b90b2ad6c17e",
+      "fft.h": "fb55f69ac14cdbac66b9c76053069ff63bc36d18af20d8c028b9acc0aad6516a",
+      "stft.h": "7422ff5ddc2a017dc0587dcce99ce5ba30a2414bc2996081f6b00d56905d9b8c",
+      "linear.h": "9e777fe14653d496f5e0678fe4b9d8b01a0909bb2130bf4757a21ccad7292a02",
+      "approx.h": "bf6f703193253a241e7a80d44547bb73c383a9a1f1ebe1f7fefdcf3d234515bd",
+      "platform/fft-linear.h": "7c2ed61df7895af7b1a37f1073f833abdc971953277ece58128c9c7b4ca6cef2"
+    }
+  }
+]

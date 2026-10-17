@@ -1,0 +1,22 @@
+[package]
+name = "local-tts-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Offline text-to-speech in native Rust: Kokoro, VITS, Piper, Vosk, Chatterbox and compact backends with pinned, verified model packages"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+hound.workspace = true
+ort = { version = "=2.0.0-rc.10", features = ["ndarray"] }
+ndarray = "0.16"
+sha2 = "0.10"
+tempfile = "3"
+unicode-normalization = "0.1"
+tokenizers = { version = "0.22", default-features = false, features = ["fancy-regex"] }
+rand = "0.9"
+
+[build-dependencies]
+cc = "1.5.1"

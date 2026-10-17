@@ -1,0 +1,72 @@
+{
+  "repository": "onnx-community/chatterbox-multilingual-ONNX",
+  "revision": "452d3f434aa592098f1eedac9099f33642ab2da5",
+  "license": "MIT",
+  "files": {
+    "README.md": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/README.md",
+      "sha256": "835c96a94689b59c27f527c059d2bd37567c48223cd8ce00bff5b341c02b99d6",
+      "bytes": 18077
+    },
+    "default_voice.wav": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/default_voice.wav",
+      "sha256": "3ebc531cdaba358a327099c1c4f0448026719957bcf4d8e9868767f227e02f4e",
+      "bytes": 714320
+    },
+    "onnx/conditional_decoder.onnx": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/conditional_decoder.onnx",
+      "sha256": "1656d0d31332bae1854839959a3139300ebb67c178651dfa3f8c5fbfa5351351",
+      "bytes": 6350448
+    },
+    "onnx/conditional_decoder.onnx_data": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/conditional_decoder.onnx_data",
+      "sha256": "51d58345a272747665ec9d5bb61e01835258a940e321a288582ac4c18cf01b5a",
+      "bytes": 533970816
+    },
+    "onnx/embed_tokens.onnx": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/embed_tokens.onnx",
+      "sha256": "f785819ca4f6271262d5bb8971d62796c3a909e3b031982c113dbe83a4c3b854",
+      "bytes": 13286
+    },
+    "onnx/embed_tokens.onnx_data": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/embed_tokens.onnx_data",
+      "sha256": "2a15f7dd73b2ee47f6edf87740324011594b5a528ed6471ae55e327ed6cad68c",
+      "bytes": 68390912
+    },
+    "onnx/language_model_q4.onnx": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/language_model_q4.onnx",
+      "sha256": "7f8cdca83b2493536cbf3acf421199808a3d68736f55f4eabd20ef8a99da4313",
+      "bytes": 227911
+    },
+    "onnx/language_model_q4.onnx_data": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/language_model_q4.onnx_data",
+      "sha256": "e79ab8784122a501718868b9631ff46e151c552d9b24e50f25d721f375e3526c",
+      "bytes": 353621248
+    },
+    "onnx/speech_encoder.onnx": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/speech_encoder.onnx",
+      "sha256": "8f1c8a0f89b77bf9cd5dd8f2e034eb2c79dc00fe70d41196b28c257643b00ccb",
+      "bytes": 1184608
+    },
+    "onnx/speech_encoder.onnx_data": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/onnx/speech_encoder.onnx_data",
+      "sha256": "92f8f290fc9720e169bc2412c507209e20b03f6564bc3243739e25c56f7dfb8f",
+      "bytes": 591274880
+    },
+    "tokenizer.json": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/tokenizer.json",
+      "sha256": "29d48c4a178f6af3ad5130097c34744639e9294847b38a7b912c8c68027cb819",
+      "bytes": 71798
+    },
+    "tokenizer_config.json": {
+      "url": "https://huggingface.co/onnx-community/chatterbox-multilingual-ONNX/resolve/452d3f434aa592098f1eedac9099f33642ab2da5/tokenizer_config.json",
+      "sha256": "b35967f93e30313d05fc9d520721ca9f671aaa5b3edbb03059aed3ff68b4c4c0",
+      "bytes": 244
+    },
+    "LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/resemble-ai/chatterbox/5de7a54aa4e5e2baadb0182dde554908b48b85c2/LICENSE",
+      "sha256": "4248e910a928849fe5815a0f9236e17fa07768d95b9193212752c464b93d6caa",
+      "bytes": 1067
+    }
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "status": "pinned-for-import",
+  "candidates": {
+    "fr": {
+      "repository": "neongeckocom/tts-vits-css10-fr",
+      "revision": "a3247f154d2fa5099bee23de35ba19907bc31b48",
+      "declared_license": "BSD-3-Clause",
+      "registry_model": "vits",
+      "registry_dataset": "css10",
+      "weights": "model_file.pth.tar",
+      "tensor_count": 696,
+      "tensor_schema_sha256": "f2e385d7f0654c06f940091e0b63f5fe0883a1952f3b414cec045a8392d29cd3",
+      "vocabulary_size": 129,
+      "files": {
+        "config.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/config.json",
+          "sha256": "31a9f77212bb8d5eb016c9f2c5c32aefc586c9396db6e3fd463500cf48984bec",
+          "bytes": 7787
+        },
+        "language_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/language_ids.json",
+          "sha256": "34b618c6f74409c840996348eabc49ec3d62bcdcc1e5e969b9e5596c40705e0a",
+          "bytes": 15
+        },
+        "speaker_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/speaker_ids.json",
+          "sha256": "9fe43187bd8e90cea44940f27b807aa66dd65a7be4b60e3aac884deb05799cde",
+          "bytes": 32
+        },
+        "README.md": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/README.md",
+          "sha256": "5dc8336b4f630cfa3a16680b4ff59dd81c76df6b061ce8afa86d8deec7f4622e",
+          "bytes": 30
+        },
+        "model_file.pth.tar": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/model_file.pth.tar",
+          "sha256": "e5aea1c264096fb0aa44ad3151ad3c8e22098a170235629b73c0ae31a69ccb3b",
+          "bytes": 108563599
+        },
+        "UPSTREAM-MODELS.json": {
+          "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/TTS/.models.json",
+          "sha256": "622e77830b5d0447beacd9359ae069b79dc70777414da55619e9f9c4e4c32d31",
+          "bytes": 44041
+        },
+        "DATASET.md": {
+          "url": "https://raw.githubusercontent.com/Kyubyong/css10/b13551d643fb11b54e037284c23a2eb0f92c5dc0/README.md",
+          "sha256": "40928a863820a88f0140d5e2ef79fae34fc60af68c4c7c6067a92ad366052f44",
+          "bytes": 7265
+        },
+        "DATASET-REPOSITORY-LICENSE.txt": {
+          "url": "https://raw.githubusercontent.com/Kyubyong/css10/b13551d643fb11b54e037284c23a2eb0f92c5dc0/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357
+        }
+      },
+      "test_reference": {
+        "url": "https://huggingface.co/neongeckocom/tts-vits-css10-fr/resolve/a3247f154d2fa5099bee23de35ba19907bc31b48/model.pt",
+        "sha256": "84ccc5f54686d2ab1f7a405467ea169b38f525dc9a9300498c8fd68698a67027",
+        "bytes": 113895771,
+        "usage": "Original Python components for opt-in tests only; never loaded by importer or shipped."
+      },
+      "dataset_description": "CSS10 LibriVox audiobook recordings",
+      "provenance_limits": [
+        "Publisher model card declares BSD-3-Clause but supplies no full weight copyright notice.",
+        "CSS10 LibriVox audiobook recordings. Complete recording/transcript rights and speaker consent for adaptation are not independently verified."
+      ]
+    },
+    "it": {
+      "repository": "neongeckocom/tts-vits-cv-it",
+      "revision": "c743425a30f8b4a0ea5fb50eb6f17310762f3216",
+      "declared_license": "BSD-3-Clause",
+      "registry_model": null,
+      "registry_dataset": "cv",
+      "weights": "model_file.pth.tar",
+      "tensor_count": 696,
+      "tensor_schema_sha256": "d94c0389d2eb504fd33ddcb36d8ab68355a7f029acbcf089bc71f7946b9ca84b",
+      "vocabulary_size": 140,
+      "files": {
+        "config.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/config.json",
+          "sha256": "f04c6547174c759ed27d3fb8b4437b661b03cc9694a3693de570449db6c797ba",
+          "bytes": 8174
+        },
+        "language_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/language_ids.json",
+          "sha256": "5ca92dbc231c92e9941e0df5ec226894d6edea52ecbbd1c2be7d4c996b299380",
+          "bytes": 15
+        },
+        "speaker_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/speaker_ids.json",
+          "sha256": "ed087fc8fbcd349006348d2a3b03d73dfd980e279bbb6a3412c4d9e67ba025b1",
+          "bytes": 32
+        },
+        "README.md": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/README.md",
+          "sha256": "5dc8336b4f630cfa3a16680b4ff59dd81c76df6b061ce8afa86d8deec7f4622e",
+          "bytes": 30
+        },
+        "model_file.pth.tar": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/model_file.pth.tar",
+          "sha256": "508ede6d4a8f876b77cd62034da93d82e1db8cd0019b49d427f820f2079c5833",
+          "bytes": 108572431
+        },
+        "UPSTREAM-MODELS.json": {
+          "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/TTS/.models.json",
+          "sha256": "622e77830b5d0447beacd9359ae069b79dc70777414da55619e9f9c4e4c32d31",
+          "bytes": 44041
+        }
+      },
+      "test_reference": {
+        "url": "https://huggingface.co/neongeckocom/tts-vits-cv-it/resolve/c743425a30f8b4a0ea5fb50eb6f17310762f3216/model.pt",
+        "sha256": "47d6b417170869fe81bdc42e29df173eb00b1b935c21f4f9e4bf3b5c49698447",
+        "bytes": 113904923,
+        "usage": "Original Python components for opt-in tests only; never loaded by importer or shipped."
+      },
+      "dataset_description": "Common Voice subset; exact release and selection not documented by model card",
+      "provenance_limits": [
+        "Publisher model card declares BSD-3-Clause but supplies no full weight copyright notice.",
+        "Common Voice subset; exact release and selection not documented by model card. Complete recording/transcript rights and speaker consent for adaptation are not independently verified.",
+        "Pinned Coqui registry has no matching Italian CV entry; other Italian entries describe different models and do not establish this checkpoint license."
+      ]
+    },
+    "pt": {
+      "repository": "neongeckocom/tts-vits-cv-pt",
+      "revision": "3a1261ab510baede428b523c490c9da8bb7663c1",
+      "declared_license": "BSD-3-Clause",
+      "registry_model": "vits",
+      "registry_dataset": "cv",
+      "weights": "model_file.pth.tar",
+      "tensor_count": 696,
+      "tensor_schema_sha256": "f2e385d7f0654c06f940091e0b63f5fe0883a1952f3b414cec045a8392d29cd3",
+      "vocabulary_size": 129,
+      "files": {
+        "config.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/config.json",
+          "sha256": "5229da0cefe64bfadd86f01e2a06c7ceaf893304a064b3bdd64f048c4456cdd5",
+          "bytes": 7907
+        },
+        "language_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/language_ids.json",
+          "sha256": "94a3b681575f14b7cb92e0405521af19ce42bf6d1bc9020374cfbeab394fdeee",
+          "bytes": 15
+        },
+        "speaker_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/speaker_ids.json",
+          "sha256": "1ff1c4276b158bb52c9413ead3c00ca85254bcd12a3c60eefedb66cb3ab5edbb",
+          "bytes": 30
+        },
+        "README.md": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/README.md",
+          "sha256": "5dc8336b4f630cfa3a16680b4ff59dd81c76df6b061ce8afa86d8deec7f4622e",
+          "bytes": 30
+        },
+        "model_file.pth.tar": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/model_file.pth.tar",
+          "sha256": "2002176aa93a244b63b70618ba6ddc45d7c649661c99167d143e7d7d96f0c258",
+          "bytes": 108563791
+        },
+        "UPSTREAM-MODELS.json": {
+          "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/TTS/.models.json",
+          "sha256": "622e77830b5d0447beacd9359ae069b79dc70777414da55619e9f9c4e4c32d31",
+          "bytes": 44041
+        }
+      },
+      "test_reference": {
+        "url": "https://huggingface.co/neongeckocom/tts-vits-cv-pt/resolve/3a1261ab510baede428b523c490c9da8bb7663c1/model.pt",
+        "sha256": "236421eb43a86e0b07142c290a88f59d012c7065ed041671eef696c520a22364",
+        "bytes": 113895963,
+        "usage": "Original Python components for opt-in tests only; never loaded by importer or shipped."
+      },
+      "dataset_description": "Common Voice subset; exact release and selection not documented by model card",
+      "provenance_limits": [
+        "Publisher model card declares BSD-3-Clause but supplies no full weight copyright notice.",
+        "Common Voice subset; exact release and selection not documented by model card. Complete recording/transcript rights and speaker consent for adaptation are not independently verified."
+      ]
+    },
+    "pl": {
+      "repository": "neongeckocom/tts-vits-mai-pl",
+      "revision": "2d9aebed4eb67d97232ced19b975701276ad4b7c",
+      "declared_license": "BSD-3-Clause",
+      "registry_model": "vits",
+      "registry_dataset": "mai_female",
+      "weights": "model_file.pth.tar",
+      "tensor_count": 696,
+      "tensor_schema_sha256": "f2e385d7f0654c06f940091e0b63f5fe0883a1952f3b414cec045a8392d29cd3",
+      "vocabulary_size": 129,
+      "files": {
+        "config.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/config.json",
+          "sha256": "c5752fb90010211ab113f1fa95406a5de4bdabaee4505565d7014abead062dde",
+          "bytes": 7833
+        },
+        "language_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/language_ids.json",
+          "sha256": "c5d1666b4d518d8dde11ce2d2180f367a27396465da9f965c395ab52f9bdfc55",
+          "bytes": 15
+        },
+        "speaker_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/speaker_ids.json",
+          "sha256": "b7a4ab426506c72aa27b21477187e7d606bc3e2dbbb181985b8f00b3bdd188d5",
+          "bytes": 32
+        },
+        "README.md": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/README.md",
+          "sha256": "5dc8336b4f630cfa3a16680b4ff59dd81c76df6b061ce8afa86d8deec7f4622e",
+          "bytes": 30
+        },
+        "model_file.pth.tar": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/model_file.pth.tar",
+          "sha256": "a9bd067726f70d6284cecfd78fa09fe298d5da96ccd0883702824d8e6f73e580",
+          "bytes": 108563727
+        },
+        "UPSTREAM-MODELS.json": {
+          "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/TTS/.models.json",
+          "sha256": "622e77830b5d0447beacd9359ae069b79dc70777414da55619e9f9c4e4c32d31",
+          "bytes": 44041
+        }
+      },
+      "test_reference": {
+        "url": "https://huggingface.co/neongeckocom/tts-vits-mai-pl/resolve/2d9aebed4eb67d97232ced19b975701276ad4b7c/model.pt",
+        "sha256": "51cf7ebec4c47c8881c146aac2f91f4d45100126b4e49e5d99f43d5c01e63f18",
+        "bytes": 113895899,
+        "usage": "Original Python components for opt-in tests only; never loaded by importer or shipped."
+      },
+      "dataset_description": "MAI Polish recordings; exact release and speaker rights not documented by model card",
+      "provenance_limits": [
+        "Publisher model card declares BSD-3-Clause but supplies no full weight copyright notice.",
+        "MAI Polish recordings; exact release and speaker rights not documented by model card. Complete recording/transcript rights and speaker consent for adaptation are not independently verified."
+      ]
+    },
+    "nl": {
+      "repository": "neongeckocom/tts-vits-css10-nl",
+      "revision": "f0cc92db6defbb81497e8b858cf527a48ce51d18",
+      "declared_license": "BSD-3-Clause",
+      "registry_model": "vits",
+      "registry_dataset": "css10",
+      "weights": "model_file.pth.tar",
+      "tensor_count": 696,
+      "tensor_schema_sha256": "f2e385d7f0654c06f940091e0b63f5fe0883a1952f3b414cec045a8392d29cd3",
+      "vocabulary_size": 129,
+      "files": {
+        "config.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/config.json",
+          "sha256": "f4a2c8ac508e23e003f72bb09af885bc1f4de8efe31d5358fe3d55499eaaa0c2",
+          "bytes": 7832
+        },
+        "language_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/language_ids.json",
+          "sha256": "c79383f40940714f402bfe5f402182be77efd29a15fe3865ff4380fabed50078",
+          "bytes": 15
+        },
+        "speaker_ids.json": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/speaker_ids.json",
+          "sha256": "6c9b6dd79bbf4d952541581a5c70a14bdea2adf2ca07a5a4b170ea901e8be315",
+          "bytes": 30
+        },
+        "README.md": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/README.md",
+          "sha256": "5dc8336b4f630cfa3a16680b4ff59dd81c76df6b061ce8afa86d8deec7f4622e",
+          "bytes": 30
+        },
+        "model_file.pth.tar": {
+          "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/model_file.pth.tar",
+          "sha256": "0992addce339364c23c052ca760fff96129c555e62d8492391f80da4e36ae142",
+          "bytes": 108563663
+        },
+        "UPSTREAM-MODELS.json": {
+          "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/TTS/.models.json",
+          "sha256": "622e77830b5d0447beacd9359ae069b79dc70777414da55619e9f9c4e4c32d31",
+          "bytes": 44041
+        },
+        "DATASET.md": {
+          "url": "https://raw.githubusercontent.com/Kyubyong/css10/b13551d643fb11b54e037284c23a2eb0f92c5dc0/README.md",
+          "sha256": "40928a863820a88f0140d5e2ef79fae34fc60af68c4c7c6067a92ad366052f44",
+          "bytes": 7265
+        },
+        "DATASET-REPOSITORY-LICENSE.txt": {
+          "url": "https://raw.githubusercontent.com/Kyubyong/css10/b13551d643fb11b54e037284c23a2eb0f92c5dc0/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357
+        }
+      },
+      "test_reference": {
+        "url": "https://huggingface.co/neongeckocom/tts-vits-css10-nl/resolve/f0cc92db6defbb81497e8b858cf527a48ce51d18/model.pt",
+        "sha256": "da06249c1a45d1f5ead7bf0131a6b2c2cc7084a3735d8b1b8c98bb2f8d90e8bb",
+        "bytes": 113895835,
+        "usage": "Original Python components for opt-in tests only; never loaded by importer or shipped."
+      },
+      "dataset_description": "CSS10 LibriVox audiobook recordings",
+      "provenance_limits": [
+        "Publisher model card declares BSD-3-Clause but supplies no full weight copyright notice.",
+        "CSS10 LibriVox audiobook recordings. Complete recording/transcript rights and speaker consent for adaptation are not independently verified."
+      ]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "repository": "csukuangfj/vits-ljs",
+  "revision": "7ac337c834f318e45a34037cb3371cc3929187ff",
+  "source_revision": "2e561ba58618d021b5b8323d3765880f7e0ecfdb",
+  "license": "Apache-2.0 (mirror declaration); upstream code MIT; LJSpeech public-domain record retained",
+  "files": {
+    "ljs-config.json": {
+      "url": "https://huggingface.co/csukuangfj/vits-ljs/resolve/7ac337c834f318e45a34037cb3371cc3929187ff/ljs_base.json",
+      "sha256": "ae18673015c1346c82af442a73f05297216655a4d931dc8d8315a6cef429832e"
+    },
+    "MODEL_CARD.md": {
+      "url": "https://huggingface.co/csukuangfj/vits-ljs/resolve/7ac337c834f318e45a34037cb3371cc3929187ff/README.md",
+      "sha256": "26711a83b9cfccab716b482512ee95f53de9aaf68c3a3c4400c789ab52892a3c"
+    },
+    "symbols.py.txt": {
+      "url": "https://raw.githubusercontent.com/jaywalnut310/vits/2e561ba58618d021b5b8323d3765880f7e0ecfdb/text/symbols.py",
+      "sha256": "e8871acbc37bd79f61ed063a2b3aa20e20555ddec15c6b9f29e1ab05e7f8b776"
+    },
+    "DATASET.html": {
+      "url": "https://keithito.com/LJ-Speech-Dataset/",
+      "sha256": "e34022ad6170be26b411be34e79c6c44c1524e01c91175feea03d01a26f3643c"
+    },
+    "SOURCE-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/jaywalnut310/vits/2e561ba58618d021b5b8323d3765880f7e0ecfdb/LICENSE",
+      "sha256": "3d8165162cef96f686f02146ac2e4ae80db5797296a99c658befa424ee64727b"
+    },
+    "WEIGHTS-LICENSE.txt": {
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "pretrained_ljs.pth": {
+      "url": "https://huggingface.co/csukuangfj/vits-ljs/resolve/7ac337c834f318e45a34037cb3371cc3929187ff/pretrained_ljs.pth",
+      "sha256": "c94fb49d08ba90c598de16e7d5dec8d26bf225c1cf193a4fba05eb2dbda5a561"
+    }
+  }
+}

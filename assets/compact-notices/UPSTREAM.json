@@ -1,0 +1,8 @@
+{
+  "inflect_symbols_source": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/blob/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/runtime/text/symbols.py",
+  "inflect_notice": "Inflect-symbols-MIT.txt",
+  "kitten_reference_source": "https://raw.githubusercontent.com/KittenML/KittenTTS/8ed679c08e0976b236bd5d0dc4ec9ddd98b0da98/kittenml/kittentts_legacy/onnx_model.py",
+  "kitten_reference_sha256": "f1c1007237ef90dafe9ec3b7613102092671f60ca5c3df13bdb486dda70fbd5b",
+  "kitten_notice": "Kitten-Apache-2.0.txt",
+  "modifications": "Original Rust host inference with BSD CMU dictionary pronunciation, bounded output/chunks and cancellation. Publisher vocabulary IDs retained; no eSpeak-ng or Python inference bundled."
+}

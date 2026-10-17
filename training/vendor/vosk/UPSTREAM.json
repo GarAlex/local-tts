@@ -1,0 +1,84 @@
+{
+  "repository": "alphacep/vosk-tts",
+  "revision": "b492223c8747a24499e4c1ae905800e85ab887b4",
+  "files": {
+    "models.py": {
+      "sha256": "eb223b60d6f00ae8fa953f88b402d19e634b83d272d2b9cd6e92a77c35514ebb",
+      "size": 67850
+    },
+    "modules.py": {
+      "sha256": "f6514eaf7fab47d866ee0f9da94ca6ab6e45ebaf246151408da20dd14f242a75",
+      "size": 13166
+    },
+    "attentions.py": {
+      "sha256": "749500b9a262d797ca6a5b723c9c0cd9fd0161b64119aa51dc3680e84a21886b",
+      "size": 18095
+    },
+    "commons.py": {
+      "sha256": "2316b87343cb27a81e0a8cf6c2d47400e3e118fb36887380f821fb7c735f8f43",
+      "size": 4778
+    },
+    "stft.py": {
+      "sha256": "3fbd268e9efa3708f7f7a3a332d31227a8d752afc80e6e96cab7f47628a69e0b",
+      "size": 12134
+    },
+    "pqmf.py": {
+      "sha256": "0fa98f714f022602e3abbac850cb911c4ea4be81e131fc4bff2d1d7c475659c3",
+      "size": 4510
+    },
+    "train_ms.py": {
+      "sha256": "fa718a06635997031c0f5cd96d5e0e3b334c64d321d8583a1132280735a5ac4c",
+      "size": 25604
+    },
+    "train_finetune.py": {
+      "sha256": "9054c6681b96f912ffcc57d1ae42eedd7d1b5b467d44191f882daa9aab748be6",
+      "size": 24875
+    },
+    "transforms.py": {
+      "sha256": "9d95e518610c35581c4f1c3b4e8eeca91b7c3d6899e7f0ebb86a0387394d3046",
+      "size": 8490
+    },
+    "onnx_export.py": {
+      "sha256": "b2b14c0c1f3cfcbdcd83f2e994482861012a26997ba6e2c349a1f43de7a00d3d",
+      "size": 2912
+    },
+    "README.md": {
+      "sha256": "7c02f7d013ef14359601d67622608d58c24b782c04be181b604376a53cf321f2",
+      "size": 2085
+    },
+    "text/symbols.py": {
+      "sha256": "b01e4e9cb9b727c3f3202620d0acd5dc6d372094bea94eb0a5df0222c7db10db",
+      "size": 6034
+    },
+    "text/LICENSE": {
+      "sha256": "f89accd9d66f6a011f19997d7a21cf71a35ffe2e2d0911b5460cbd0cab52a581",
+      "size": 1053
+    },
+    "losses.py": {
+      "sha256": "7501eda57862272ecfcf9a8fc2c655b10a6f4284cd58393bfb319220175613a1",
+      "size": 5568
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/alphacep/vosk-tts/b492223c8747a24499e4c1ae905800e85ab887b4/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "size": 11357
+    },
+    "MB-VITS-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/FENRlR/MB-iSTFT-VITS2/a1fef37b0d2fd35b5d588c6862f94e7be27b6408/LICENSE",
+      "sha256": "6571764afe6361eb24f5ce3a793a677a661d032e97d9c814e764a0ef96033b5e",
+      "size": 1063
+    },
+    "PQMF-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/kan-bayashi/ParallelWaveGAN/de8efa831f7c68b2db223a07e817505afa9fead1/LICENSE",
+      "sha256": "57760517a3a895ff36d4feb6a7c133b90a07e0b39ac064dd99fa21b003a9040d",
+      "size": 1123
+    }
+  },
+  "changes": [
+    "Relative imports isolate this architecture from the existing VITS modules.",
+    "Unused optional spectral/SLM discriminator stack omitted; generator architecture unchanged.",
+    "Portable project monotonic alignment reused.",
+    "ONNX inverse-STFT overlap normalization corrected in project export adapter.",
+    "Dynamic relative-embedding gather replaces Python length branches for ONNX short/long inputs."
+  ]
+}

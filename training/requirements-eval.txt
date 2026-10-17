@@ -1,0 +1,5 @@
+# Optional local speech-recognition diagnostics; not needed for TTS inference.
+# Install into the existing training environment; its torch/numpy/scipy are reused.
+openai-whisper==20250625
+# Optional stored-weight compression and comparison; runtime TTS stays Rust.
+onnxruntime==1.23.2

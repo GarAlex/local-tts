@@ -1,0 +1,16 @@
+[package]
+name = "local-tts-speak"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "tts-speak: inference-only command line that writes WAV from text using local-tts-core"
+
+[[bin]]
+name = "tts-speak"
+path = "src/main.rs"
+
+[dependencies]
+local-tts-core = { path = "../tts-core" }
+serde_json.workspace = true
+tempfile = "3"

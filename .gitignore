@@ -1,0 +1,12 @@
+# Build output and local environments
+/target/
+/.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Downloaded models, datasets and training artifacts — never committed
+/datasets/
+/checkpoints/
+/voices/
+/dist/

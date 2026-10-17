@@ -1,0 +1,11 @@
+[package]
+name = "dispatch"
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+authors = ["Local TTS contributors"]
+description = "Project-local main-queue compatibility adapter backed by dispatch2"
+publish = false
+
+[target.'cfg(target_vendor = "apple")'.dependencies]
+dispatch2 = "=0.3.1"

@@ -1,0 +1,17 @@
+[workspace]
+members = ["crates/tts-core", "crates/tts-cli", "crates/tts-studio", "crates/tts-ffi", "crates/dispatch-compat", "crates/tts-speak"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+rust-version = "1.88"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hound = "3.5"
+
+[patch.crates-io]
+dispatch = { path = "crates/dispatch-compat" }

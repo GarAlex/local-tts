@@ -1,0 +1,23 @@
+{
+  "f32": {
+    "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/onnx/model.onnx",
+    "sha256": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+    "label": "FP32",
+    "folder": "kokoro-en",
+    "bytes": 325532232
+  },
+  "q8": {
+    "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/onnx/model_quantized.onnx",
+    "sha256": "fbae9257e1e05ffc727e951ef9b9c98418e6d79f1c9b6b13bd59f5c9028a1478",
+    "label": "Q8",
+    "folder": "kokoro-en-q8",
+    "bytes": 92361116
+  },
+  "q4": {
+    "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/onnx/model_q4.onnx",
+    "sha256": "04cf570cf9c4153694f76347ed4b9a48c1b59ff1de0999e6605d123966b197c7",
+    "label": "Q4 (mixed FP32)",
+    "folder": "kokoro-en-q4",
+    "bytes": 305215966
+  }
+}

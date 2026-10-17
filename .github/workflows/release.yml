@@ -1,0 +1,64 @@
+# Prebuilt tts-speak and the C library on every version tag. Push a tag like
+# v0.1.0 and this publishes, after ci.yml passes on the tagged commit:
+#   - local-tts-<tag>-linux-x64.tar.gz
+#   - local-tts-<tag>-macos-arm64.tar.gz
+# each holding tts-speak, liblocal_tts (shared + static), include/local_tts.h,
+# the license and third-party notices. Model packages are never bundled; see docs/TTS_CLI.md.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  binaries:
+    needs: ci
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+            shared: liblocal_tts.so
+          - os: macos-latest
+            target: macos-arm64
+            shared: liblocal_tts.dylib
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master, 2026-09
+        with:
+          toolchain: 1.96.0
+      - name: Build
+        run: cargo build --release --locked -p local-tts-speak -p local-tts-ffi
+      - name: Package
+        run: |
+          name="local-tts-${GITHUB_REF_NAME}-${{ matrix.target }}"
+          mkdir -p "stage/$name/lib" "stage/$name/include" dist
+          cp target/release/tts-speak "stage/$name/"
+          cp target/release/${{ matrix.shared }} target/release/liblocal_tts.a "stage/$name/lib/"
+          cp include/local_tts.h "stage/$name/include/"
+          cp LICENSE README.md docs/TTS_CLI.md docs/THIRD_PARTY.md "stage/$name/"
+          # ONNX Runtime and the other dependencies are linked in; their notices travel too.
+          cp -R assets/release-notices "stage/$name/notices"
+          tar -czf "dist/$name.tar.gz" -C stage "$name"
+      # Provenance a downloader can verify with `gh attestation verify`.
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: dist/*.tar.gz
+      - name: Attach to the release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          files: dist/*.tar.gz
+          generate_release_notes: true

@@ -1,0 +1,144 @@
+{
+  "inflect": {
+    "repository": "owensong/Inflect-Nano-v2-ONNX",
+    "revision": "df3627e44c26192714c9dcba6b8e9b47e7a6e3d9",
+    "folder": "inflect-nano-en",
+    "license": "Apache-2.0",
+    "files": {
+      "onnx/duration.onnx": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/onnx/duration.onnx",
+        "sha256": "6e5fe09584f979dcd2da4f89d5274385ad5197efcd5ddcaa5ac03db637d7451e",
+        "bytes": 3636541
+      },
+      "onnx/decode.onnx": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/onnx/decode.onnx",
+        "sha256": "f98b1ba21f3d5306ee6cf96a02ba9783082ef99314e77f1ee0c03954dc7de2b8",
+        "bytes": 12570009
+      },
+      "config.json": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/config.json",
+        "sha256": "8669007c29a215dfc6c4cbb4962c01440f4d806022584699404aee58e5249f03",
+        "bytes": 1210
+      },
+      "LICENSE": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/LICENSE",
+        "sha256": "12c48c640d1d0baf158d45175a4238b9227c71c77f50b0d15791b8efc08cd793",
+        "bytes": 10455
+      },
+      "THIRD_PARTY_NOTICES.md": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/THIRD_PARTY_NOTICES.md",
+        "sha256": "2ead63b7d9cddd6c1d12a96d88de0ade6fd3eabd1278825c0a3a2c1d3647ab4b",
+        "bytes": 1233
+      },
+      "runtime/text/LICENSE": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/runtime/text/LICENSE",
+        "sha256": "f89accd9d66f6a011f19997d7a21cf71a35ffe2e2d0911b5460cbd0cab52a581",
+        "bytes": 1053
+      },
+      "runtime/text/symbols.py": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/runtime/text/symbols.py",
+        "sha256": "e8871acbc37bd79f61ed063a2b3aa20e20555ddec15c6b9f29e1ab05e7f8b776",
+        "bytes": 642
+      },
+      "README.md": {
+        "url": "https://huggingface.co/owensong/Inflect-Nano-v2-ONNX/resolve/df3627e44c26192714c9dcba6b8e9b47e7a6e3d9/README.md",
+        "sha256": "ee902d9baed5cc4853c4374baa13d19c43ed808b94f51e1e722391bf62492579",
+        "bytes": 1962
+      },
+      "cmudict.dict": {
+        "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+        "bytes": 3618488,
+        "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/cmudict.dict"
+      },
+      "CMUDICT-LICENSE.txt": {
+        "sha256": "bd4ce8e44170a5f9f481310ca85c51de3c4f851a65e679b40e603b143bd3542a",
+        "bytes": 1754,
+        "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/LICENSE"
+      }
+    }
+  },
+  "kitten": {
+    "repository": "KittenML/kitten-tts-nano-0.8-int8",
+    "revision": "84781d74e29ee25217551556398b42f80593a813",
+    "folder": "kitten-nano-en",
+    "license": "Apache-2.0",
+    "files": {
+      "kitten_tts_nano_v0_8.onnx": {
+        "url": "https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8/resolve/84781d74e29ee25217551556398b42f80593a813/kitten_tts_nano_v0_8.onnx",
+        "sha256": "f7b0afcbee92870b32b8e0276d855b954dc25470c9f051b376ac7eee537c76fc",
+        "bytes": 24369971
+      },
+      "voices.npz": {
+        "url": "https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8/resolve/84781d74e29ee25217551556398b42f80593a813/voices.npz",
+        "sha256": "8aa7cee235abb0739cb51e6559685f65a4dacd95568833d05699b1633f519b3f",
+        "bytes": 3278902,
+        "acquisition_only": true
+      },
+      "config.json": {
+        "url": "https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8/resolve/84781d74e29ee25217551556398b42f80593a813/config.json",
+        "sha256": "b66006ccbeccd4de5fc3c9272059c47f5725df7215fd889785c03602652fab64",
+        "bytes": 688
+      },
+      "README.md": {
+        "url": "https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8/resolve/84781d74e29ee25217551556398b42f80593a813/README.md",
+        "sha256": "ff39adbcb653e9beaa612b405c4e301ee62eb4201b32dd77ae36f4078537b8ef",
+        "bytes": 741
+      },
+      "cmudict.dict": {
+        "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+        "bytes": 3618488,
+        "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/cmudict.dict"
+      },
+      "CMUDICT-LICENSE.txt": {
+        "sha256": "bd4ce8e44170a5f9f481310ca85c51de3c4f851a65e679b40e603b143bd3542a",
+        "bytes": 1754,
+        "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/74790861f652b15e4ac49015a90074ad62a27690/LICENSE"
+      },
+      "styles/expr-voice-2-m.f32": {
+        "sha256": "5e0b649453ac74ca91dfc6730fb318567fc34a24bca9e910cdb39f07e611a83f",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-2-f.f32": {
+        "sha256": "0f56274d033abbb4103140ff346e4f343c31dd0d2d3a45269a0988245291330e",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-3-m.f32": {
+        "sha256": "388af21b8452d723738e1cc625838182cd306e36cbffc3ab2e9f310644783a18",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-3-f.f32": {
+        "sha256": "33c236c8ae79ba95c257c7b47196f22ec9d81a392e96aa0fb3a6397ac4294f29",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-4-m.f32": {
+        "sha256": "1e036f1166acf869ba42d20a6f77ee13433f3959b44600af210e67b332cb53ca",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-4-f.f32": {
+        "sha256": "ae9a2bc901bfd2ca906e3be4996cbb5618b5a3724bef574f828cb1c1d94f7da9",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-5-m.f32": {
+        "sha256": "106a8a5a8a02b82220cca9f467d638c8558e6e3d8f54b59ea54b326cbc91502d",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "styles/expr-voice-5-f.f32": {
+        "sha256": "4038768964607180b8e11e510056b9922b30b765a0f151517047143c56ff700b",
+        "bytes": 409600,
+        "derived_from": "voices.npz"
+      },
+      "LICENSE": {
+        "sha256": "787aa312b93eee80b636f35652469df29efdb7582239d6a9c088467555a3c7fd",
+        "bytes": 10394,
+        "url": "https://raw.githubusercontent.com/KittenML/KittenTTS/8ed679c08e0976b236bd5d0dc4ec9ddd98b0da98/LICENSE"
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "repository": "datasets/rhasspy/piper-checkpoints",
+  "revision": "37d1bea250e21ca0d617818d2bef1db724edb80c",
+  "files": {
+    "epoch=2090-step=1166778.ckpt": {
+      "url": "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/37d1bea250e21ca0d617818d2bef1db724edb80c/uk/uk_UA/ukrainian_tts/medium/epoch%3D2090-step%3D1166778.ckpt",
+      "sha256": "cc21fb484793e2fb819a1b2e7e1b20c6c33a5b55dbe2c81304f6049d4afb5865",
+      "size": 924491400
+    },
+    "config.json": {
+      "url": "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/37d1bea250e21ca0d617818d2bef1db724edb80c/uk/uk_UA/ukrainian_tts/medium/config.json",
+      "sha256": "20fd74d662f2d2e26b0933a3ecd557c81aab830480bd18a6812276c18f284194",
+      "size": 2491
+    },
+    "MODEL_CARD": {
+      "url": "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/37d1bea250e21ca0d617818d2bef1db724edb80c/uk/uk_UA/ukrainian_tts/medium/MODEL_CARD",
+      "sha256": "ce09d0c9d1d90cdc98d1ea8a4ecbdeb5e937d44593876e4194302c5eabbaad9d",
+      "size": 267
+    },
+    "train.sh": {
+      "url": "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/37d1bea250e21ca0d617818d2bef1db724edb80c/uk/uk_UA/ukrainian_tts/medium/train.sh",
+      "sha256": "841659b554e8fc2cb4c021cdfec30ed850c0a3661df1dda0eee522b5b910a6ea",
+      "size": 449
+    },
+    "REPOSITORY_CARD.md": {
+      "url": "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/37d1bea250e21ca0d617818d2bef1db724edb80c/README.md",
+      "sha256": "1ab8e432f4470be0e14b23f6c78a9341aa3f7e2c1b42381bdf3dc62686dd6797",
+      "size": 103
+    },
+    "SOURCE-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/rhasspy/piper/73c04d81d5590ecc46e522de3601ce7fb29fc2be/LICENSE.md",
+      "sha256": "4cd71dece7037f1d6d93cce7570c57ab75ea9ac566fd4990be2f3ab08d15b47f",
+      "size": 1071
+    },
+    "SOURCE-MODELS.py.txt": {
+      "url": "https://raw.githubusercontent.com/rhasspy/piper/73c04d81d5590ecc46e522de3601ce7fb29fc2be/src/python/piper_train/vits/models.py",
+      "sha256": "f4fce2a6b46d91d050e80a3015ed6f1b84130a4d36072f8b0d2f56f04b591af1",
+      "size": 24303
+    },
+    "DATASET-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/egorsmkv/ukrainian-tts-datasets/953d9c5afe57fad5656124be5049a453a5450a04/LICENSE",
+      "sha256": "f0d99857d1a5a706f7c06cb9ff2dbb7e379ed0d50a012a756aa3855836d48dea",
+      "size": 10760
+    },
+    "DATASET-README.md": {
+      "url": "https://raw.githubusercontent.com/egorsmkv/ukrainian-tts-datasets/953d9c5afe57fad5656124be5049a453a5450a04/README.md",
+      "sha256": "c4d4700990dc25545e2f222f54c2b5756f996d09c37af7862262a0c508dfc464",
+      "size": 2329
+    }
+  },
+  "schema_version": 1,
+  "id": "piper-uk-medium",
+  "language": "uk",
+  "license": "MIT declared by checkpoint repository; source MIT; model card CC0 claim has dataset attribution gap",
+  "source_revision": "73c04d81d5590ecc46e522de3601ce7fb29fc2be",
+  "provenance_limits": [
+    "Model card points to a dataset repository without Ukrainian data; actual dataset repository declares Apache-2.0, so card CC0 is not treated as verified.",
+    "The published records do not establish complete consent/rights lineage or earlier pretrained initialization."
+  ],
+  "speakers": {
+    "lada": 0,
+    "mykyta": 1,
+    "tetiana": 2
+  }
+}

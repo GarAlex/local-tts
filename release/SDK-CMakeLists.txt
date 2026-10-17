@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.20)
+project(LocalTTSConsumer LANGUAGES CXX)
+if(NOT APPLE)
+  message(FATAL_ERROR "This binary SDK is built for macOS. Use a matching platform build.")
+endif()
+add_library(local_tts SHARED IMPORTED)
+set_target_properties(local_tts PROPERTIES
+  IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/liblocal_tts.dylib"
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include")
+add_executable(tts-speak examples/cpp/speak.cpp)
+target_compile_features(tts-speak PRIVATE cxx_std_17)
+target_link_libraries(tts-speak PRIVATE local_tts)
+set_target_properties(tts-speak PROPERTIES BUILD_RPATH "${CMAKE_CURRENT_LIST_DIR}/lib")
+install(TARGETS tts-speak RUNTIME DESTINATION bin)
+install(FILES "${CMAKE_CURRENT_LIST_DIR}/lib/liblocal_tts.dylib" DESTINATION lib)
+set_target_properties(tts-speak PROPERTIES INSTALL_RPATH "@loader_path/../lib")
+install(DIRECTORY licenses DESTINATION .)

@@ -1,0 +1,28 @@
+{
+  "archive": {
+    "url": "https://alphacephei.com/vosk/models/vosk-model-tts-ru-0.7-multi.zip",
+    "sha256": "5da7414fabad4df88ed2f3b930798506fe1fad40abdf1c742f7b05802d62de38"
+  },
+  "files": {
+    "model.onnx": {
+      "archive_path": "vosk-model-tts-ru-0.7-multi/model.onnx",
+      "sha256": "b296f5f9220c14082a9fc428c100194a1fb4df4838af02cb753fe9a865c16da8"
+    },
+    "dictionary": {
+      "archive_path": "vosk-model-tts-ru-0.7-multi/dictionary",
+      "sha256": "b31b648edae1df9ed9257e7b9484c38184db01296795e87011debe61b8131231"
+    },
+    "config.json": {
+      "archive_path": "vosk-model-tts-ru-0.7-multi/config.json",
+      "sha256": "a95ca19094cc186821c142b303ecb3bcfb8e25b601efd0820ae9501590e54cf2"
+    },
+    "MODEL_CARD.md": {
+      "url": "https://huggingface.co/alphacep/vosk-tts-ru-multi/resolve/0960eb904b9035a9fdbba2882933a4f5a84c525f/README.md",
+      "sha256": "cc39b3f69ccd0569ec99f9ae2d643740ce8198309e5ed207fc9892d96b892e01"
+    },
+    "VOSK-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/alphacep/vosk-tts/b492223c8747a24499e4c1ae905800e85ab887b4/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    }
+  }
+}
