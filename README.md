@@ -2,6 +2,70 @@
 
 Offline Rust TTS library with a simple egui desktop application and own-voice training tools. The application calls the same library that other projects can embed. No inference server or Python runtime is required for synthesis.
 
+## Listen
+
+Every clip below was generated on a Mac CPU by this repository's `tts-speak`,
+with no network and no Python, and checked by speech recognition. Click ▶ to play.
+
+### Narration mode: text the way it is written
+
+`tts-speak --guess-unknown` (and PromoShot's local voices) reads text as
+people write it. NVIDIA NeMo's English normalization grammars, bundled and
+run natively, turn money, dates, times, scores, units and web addresses into
+words. Names the dictionary lacks are guessed and reported. Voice: Kokoro
+`af_heart`.
+
+| Written | Spoken | |
+|---|---|---|
+| On Jan. 5, 2024 at 3:19 a.m., the Kīlauea volcano erupted. Today, save $49.99 — that's 30% off — and export 2.5x faster. | On january fifth, twenty twenty four at three nineteen A M, the Kilauea volcano erupted. Today, save forty nine dollars ninety nine cents — that's thirty percent off — and export two point five times faster. | [▶ listen](docs/samples/en-narration-dates-money.mp3?raw=true) |
+| The Lakers won 112-108 at 7 p.m. ET. Grab a 5 kg camera that films at 120 km/h. Louis XIV would approve. | The Lakers won one hundred twelve to one hundred eight at seven P M Eastern Time. Grab a five kilogram camera that films at one hundred twenty kilometers per hour. Louis the fourteenth would approve. | [▶ listen](docs/samples/en-narration-scores-units.mp3?raw=true) |
+| Visit https://promoshot.app/docs or email hello@promoshot.app. Meet PromoShot, built with Figma, Canva and Kubernetes. | Visit promoshot dot app slash docs or email hello at promoshot dot app. Meet PromoShot, built with Figma, Canva and Kubernetes. | [▶ listen](docs/samples/en-narration-web-names.mp3?raw=true) |
+
+`english::narration_text` returns the spoken text for any input:
+`cargo run -p local-tts-core --example narration_text -- "Save $49.99 today"`.
+
+### English voices
+
+"Your app, on every screen, in one minute."
+
+| Voice | Package | |
+|---|---|---|
+| Kokoro `af_heart`: US female, the best quality | `kokoro-en-q8` | [▶ listen](docs/samples/en-voice-af_heart.mp3?raw=true) |
+| Kokoro `af_bella`: US female | `kokoro-en-q8` | [▶ listen](docs/samples/en-voice-af_bella.mp3?raw=true) |
+| Kokoro `am_michael`: US male | `kokoro-en-q8` | [▶ listen](docs/samples/en-voice-am_michael.mp3?raw=true) |
+| Kokoro `bf_emma`: UK female | `kokoro-en-q8` | [▶ listen](docs/samples/en-voice-bf_emma.mp3?raw=true) |
+| Kokoro `bm_george`: UK male | `kokoro-en-q8` | [▶ listen](docs/samples/en-voice-bm_george.mp3?raw=true) |
+| Kitten `Luna`: small, 31 MB | `kitten-nano-en` | [▶ listen](docs/samples/en-voice-kitten-luna.mp3?raw=true) |
+
+`kokoro-en-q8` has 28 English voices in all; `tts-speak --list-voices --backend kokoro`
+lists them with upstream's quality grades. Install with
+`tts-speak --install kokoro-en-q8 --voices-dir DIR`.
+
+### Russian and Ukrainian
+
+Numbers, percentages and dates are written as digits and read natively.
+
+| Language | Text | Voice | |
+|---|---|---|---|
+| Russian | Привет! Сегодня 5 марта, на улице 12 градусов. Скидка 30% до 15.03.2025. | Vosk `F01` | [▶ listen](docs/samples/ru-vosk-f01.mp3?raw=true) |
+| Russian | (same) | Vosk `M02` | [▶ listen](docs/samples/ru-vosk-m02.mp3?raw=true) |
+| Ukrainian | Привіт! Сьогодні 5 березня, надворі 12 градусів. Знижка 30% до 15.03.2025. | Piper `lada` | [▶ listen](docs/samples/uk-piper-lada.mp3?raw=true) |
+| Ukrainian | (same) | Piper `mykyta` | [▶ listen](docs/samples/uk-piper-mykyta.mp3?raw=true) |
+
+Russian has five speakers (`F01`–`F03`, `M01`, `M02`) and Ukrainian three
+(`lada`, `mykyta`, `tetiana`). Stress can be marked with `+` before a vowel, and
+saved corrections apply to later text; see [Cyrillic voices](docs/CYRILLIC.md),
+including the provenance notes for these packages.
+
+The commands that made these clips:
+
+```sh
+tts-speak --model voices/kokoro-en-q8 --guess-unknown --output narration.wav --text 'The Lakers won 112-108 at 7 p.m. ET.'
+tts-speak --model voices/kokoro-en-q8 --speaker bf_emma --output emma.wav --text 'Your app, on every screen, in one minute.'
+tts-speak --backend vosk --language ru --model voices/vosk-ru --speaker F01 --output ru.wav --text 'Привет! Сегодня 5 марта.'
+tts-speak --backend piper --language uk --model voices/piper-uk --speaker lada --output uk.wav --text 'Привіт! Сьогодні 5 березня.'
+```
+
 ## Run the desktop app
 
 ```sh

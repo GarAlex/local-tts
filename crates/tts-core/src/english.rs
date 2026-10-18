@@ -631,6 +631,16 @@ const SHOUTED_WORDS: &[&str] = &[
     "WON", "OWN", "USE", "ASK", "ART", "APP", "JOB", "MAP", "TIP", "YET", "NOR", "BUT",
 ];
 
+/// The text narration mode speaks for `text`, before pronunciation: the
+/// forgiving pre-pass, NeMo's English normalization, American numbers.
+/// `Save $49.99 on Jan. 5` → `Save forty nine dollars ninety nine cents on
+/// january fifth`. Useful for showing what a narration will say.
+pub fn narration_text(text: &str) -> Result<String, String> {
+    Ok(american_numbers(&crate::nemo::normalize(
+        &crate::english_tolerant::prepare(text),
+    )?))
+}
+
 /// NeMo writes the British "one hundred and eight"; American narration, as
 /// the Kokoro US voices speak, says "one hundred eight" — and the "and" blurs
 /// where one number ends ("112 to 108" heard as "112 to 100 in 8").
