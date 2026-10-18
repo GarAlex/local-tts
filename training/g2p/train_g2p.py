@@ -9,6 +9,7 @@ deliberately plain so the Rust frontend (crates/tts-core/src/g2p.rs) can run it
 natively, without ONNX Runtime, and reproduce these exact outputs.
 
 Usage: .venv/bin/python training/g2p/train_g2p.py voices/kokoro-en-q8/cmudict.dict assets/g2p-en-v1.bin
+v2:    ... assets/g2p-en-v2.bin --enc 256 --dropout 0.25 --label-smoothing 0.1 --epochs 40 --beam 8
 """
 
 import argparse
@@ -25,6 +26,7 @@ import torch.nn as nn
 
 LETTERS = list("abcdefghijklmnopqrstuvwxyz'")
 EMB, ENC, DEC = 64, 192, 384  # DEC = 2 * ENC: the bidirectional states are its context
+DROPOUT = 0.0  # training only; inference runs without it
 MAX_PHONES = 32
 
 
@@ -58,10 +60,11 @@ class G2P(nn.Module):
         self.phones = nn.Embedding(len(phones) + 2, EMB)  # 0 pad, 1 start/end
         self.decoder = nn.GRUCell(EMB + DEC, DEC)
         self.out = nn.Linear(2 * DEC, len(phones) + 2)
+        self.drop = nn.Dropout(DROPOUT)
 
     def encode(self, letters, lengths):
         packed = nn.utils.rnn.pack_padded_sequence(
-            self.letters(letters), lengths.cpu(), batch_first=True, enforce_sorted=False
+            self.drop(self.letters(letters)), lengths.cpu(), batch_first=True, enforce_sorted=False
         )
         states, _ = self.encoder(packed)
         states, _ = nn.utils.rnn.pad_packed_sequence(states, batch_first=True)
@@ -70,11 +73,11 @@ class G2P(nn.Module):
         return states, mask, torch.tanh(self.bridge(mean))
 
     def step(self, prev, hidden, context, states, mask):
-        hidden = self.decoder(torch.cat([self.phones(prev), context], -1), hidden)
+        hidden = self.decoder(torch.cat([self.drop(self.phones(prev)), context], -1), hidden)
         scores = torch.bmm(states, hidden.unsqueeze(-1)).squeeze(-1)
         scores = scores.masked_fill(~mask, -1e9)
         context = torch.bmm(torch.softmax(scores, -1).unsqueeze(1), states).squeeze(1)
-        return self.out(torch.cat([hidden, context], -1)), hidden, context
+        return self.out(self.drop(torch.cat([hidden, context], -1))), hidden, context
 
     def forward(self, letters, lengths, targets):
         states, mask, hidden = self.encode(letters, lengths)
@@ -98,6 +101,34 @@ class G2P(nn.Module):
             prev = step.argmax(-1)
             out.append(prev)
         return torch.stack(out, 1)
+
+
+@torch.no_grad()
+def beam_search(model, word, beam):
+    """Beam search over one word: total log-probability, no length penalty;
+    ties keep the earlier hypothesis. Mirrored in crates/tts-core/src/g2p.rs."""
+    letters = torch.tensor([[LETTERS.index(c) + 1 for c in word]])
+    lengths = torch.tensor([len(word)])
+    states, mask, hidden = model.encode(letters, lengths)
+    context = torch.zeros(1, DEC)
+    live = [(0.0, [], 1, hidden, context)]  # score, phones, previous id, hidden, context
+    done = []
+    for _ in range(MAX_PHONES):
+        candidates = []
+        for score, phones, prev, h, c in live:
+            logits, h2, c2 = model.step(torch.tensor([prev]), h, c, states, mask)
+            logp = torch.log_softmax(logits[0], -1)
+            top = torch.topk(logp, beam)
+            for lp, i in zip(top.values.tolist(), top.indices.tolist()):
+                candidates.append((score + lp, phones + [i], i, h2, c2))
+        candidates.sort(key=lambda x: -x[0])  # stable: ties keep generation order
+        live = []
+        for cand in candidates[:beam]:
+            (done if cand[2] in (0, 1) else live).append(cand)
+        if not live or (done and max(d[0] for d in done) >= live[0][0]):
+            break
+    best = max(done or live, key=lambda x: x[0])
+    return [i for i in best[1] if i >= 2]
 
 
 def batch(items, phone_ids, device):
@@ -124,17 +155,23 @@ def decode(ids, phones):
     return out
 
 
-def evaluate(model, items, phone_ids, phones, device):
+def evaluate(model, items, phone_ids, phones, device, beam=1):
     model.eval()
     words_wrong = phones_wrong = phones_total = 0
-    for start in range(0, len(items), 1024):
-        chunk = items[start : start + 1024]
-        letters, lengths, _ = batch(chunk, phone_ids, device)
-        for (word, ref), ids in zip(chunk, model.greedy(letters, lengths).tolist()):
-            hyp = decode(ids, phones)
-            words_wrong += hyp != ref
-            phones_wrong += edit_distance(hyp, ref)
-            phones_total += len(ref)
+    if beam > 1:
+        cpu = model.to("cpu")
+        hyps = [[phones[i - 2] for i in beam_search(cpu, w, beam)] for w, _ in items]
+        model.to(device)
+    else:
+        hyps = []
+        for start in range(0, len(items), 1024):
+            chunk = items[start : start + 1024]
+            letters, lengths, _ = batch(chunk, phone_ids, device)
+            hyps += [decode(ids, phones) for ids in model.greedy(letters, lengths).tolist()]
+    for (word, ref), hyp in zip(items, hyps):
+        words_wrong += hyp != ref
+        phones_wrong += edit_distance(hyp, ref)
+        phones_total += len(ref)
     model.train()
     return words_wrong / len(items), phones_wrong / phones_total
 
@@ -148,7 +185,7 @@ def edit_distance(a, b):
     return row[-1]
 
 
-def export(model, phones, path, metrics):
+def export(model, phones, path, metrics, beam=1):
     """Little-endian f32 tensors after a JSON header: {"phones", "letters",
     "tensors": [[name, shape]...], ...}, prefixed by its u32 byte length."""
     tensors = []
@@ -163,6 +200,7 @@ def export(model, phones, path, metrics):
             "letters": "".join(LETTERS),
             "phones": phones,
             "dims": {"emb": EMB, "enc": ENC, "dec": DEC, "max_phones": MAX_PHONES},
+            "beam": beam,
             "tensors": tensors,
             "metrics": metrics,
             "training": "CMU Pronouncing Dictionary (BSD) only; see training/g2p/train_g2p.py",
@@ -178,7 +216,13 @@ def main():
     parser.add_argument("output")
     parser.add_argument("--epochs", type=int, default=24)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--enc", type=int, default=192, help="encoder size per direction")
+    parser.add_argument("--dropout", type=float, default=0.0)
+    parser.add_argument("--label-smoothing", type=float, default=0.0)
+    parser.add_argument("--beam", type=int, default=1, help="1 = greedy")
     args = parser.parse_args()
+    global ENC, DEC, DROPOUT
+    ENC, DEC, DROPOUT = args.enc, 2 * args.enc, args.dropout
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     device = "mps" if torch.backends.mps.is_available() else "cpu"
@@ -195,7 +239,7 @@ def main():
     model = G2P(phones).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
-    loss_fn = nn.CrossEntropyLoss(ignore_index=0)
+    loss_fn = nn.CrossEntropyLoss(ignore_index=0, label_smoothing=args.label_smoothing)
     best = (1.0, None)
     for epoch in range(args.epochs):
         random.shuffle(sets["train"])
@@ -214,14 +258,21 @@ def main():
         if wer < best[0]:
             best = (wer, {k: v.detach().clone() for k, v in model.state_dict().items()})
     model.load_state_dict(best[1])
-    wer, per = evaluate(model, sets["test"], phone_ids, phones, device)
-    print(f"test WER {wer:.3f} PER {per:.4f}", flush=True)
+    if args.beam > 1:
+        g_wer, g_per = evaluate(model, sets["test"], phone_ids, phones, device, 1)
+        print(f"test WER {g_wer:.3f} PER {g_per:.4f} (greedy)", flush=True)
+    wer, per = evaluate(model, sets["test"], phone_ids, phones, device, args.beam)
+    print(f"test WER {wer:.3f} PER {per:.4f} (beam {args.beam})", flush=True)
     model = model.cpu()
-    export(model, phones, args.output, {"test_word_error": round(wer, 4), "test_phone_error": round(per, 4)})
+    export(model, phones, args.output, {"test_word_error": round(wer, 4), "test_phone_error": round(per, 4)}, args.beam)
     # Reference outputs for the Rust parity test.
     probe = [w for w, _ in sets["test"][:200]] + ["figma", "canva", "shopify", "kubernetes", "oleksandr", "tiktok"]
-    letters, lengths, _ = batch([(w, ["AA0"]) for w in probe], phone_ids, "cpu")
-    reference = {w: " ".join(decode(ids, phones)) for w, ids in zip(probe, model.greedy(letters, lengths).tolist())}
+    probe += ["galgamuwa", "kobeissi", "norte", "noreaster"]
+    if args.beam > 1:
+        reference = {w: " ".join(phones[i - 2] for i in beam_search(model, w, args.beam)) for w in probe}
+    else:
+        letters, lengths, _ = batch([(w, ["AA0"]) for w in probe], phone_ids, "cpu")
+        reference = {w: " ".join(decode(ids, phones)) for w, ids in zip(probe, model.greedy(letters, lengths).tolist())}
     Path(args.output).with_suffix(".reference.json").write_text(json.dumps(reference, indent=1))
     print("wrote", args.output, Path(args.output).stat().st_size, "bytes", flush=True)
 

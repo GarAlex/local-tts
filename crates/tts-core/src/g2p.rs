@@ -54,6 +54,8 @@ pub struct G2p {
     emb: usize,
     dec: usize,
     max_phones: usize,
+    /// Beam width the model was evaluated with; 1 is greedy.
+    beam: usize,
     letter_emb: Vec<f32>,
     phone_emb: Vec<f32>,
     forward: Gru,
@@ -141,6 +143,7 @@ impl G2p {
             emb,
             dec,
             max_phones: dim("max_phones")?,
+            beam: header["beam"].as_u64().unwrap_or(1).max(1) as usize,
             letter_emb: take("letters.weight")?,
             phone_emb: take("phones.weight")?,
             forward: gru(&mut take, "_l0", "encoder.", emb, enc)?,
@@ -163,18 +166,37 @@ impl G2p {
         if ids.is_empty() || ids.len() > 30 {
             return None;
         }
-        let embed = |table: &[f32], id: usize| table[id * self.emb..(id + 1) * self.emb].to_vec();
+        let (states, hidden) = self.encode(&ids);
+        let picked = if self.beam > 1 {
+            self.beam_search(&states, hidden)
+        } else {
+            self.greedy(&states, hidden)
+        };
+        let out: Vec<String> = picked
+            .into_iter()
+            .filter(|&i| i >= 2)
+            .map(|i| self.phones[i - 2].clone())
+            .collect();
+        (!out.is_empty()).then_some(out)
+    }
+
+    fn embed(&self, table: &[f32], id: usize) -> Vec<f32> {
+        table[id * self.emb..(id + 1) * self.emb].to_vec()
+    }
+
+    /// The letters' bidirectional states and the decoder's first hidden state.
+    fn encode(&self, ids: &[usize]) -> (Vec<Vec<f32>>, Vec<f32>) {
         let enc = self.forward.hidden;
         let mut fwd = Vec::with_capacity(ids.len());
         let mut h = vec![0.0; enc];
-        for &id in &ids {
-            h = self.forward.step(&embed(&self.letter_emb, id), &h);
+        for &id in ids {
+            h = self.forward.step(&self.embed(&self.letter_emb, id), &h);
             fwd.push(h.clone());
         }
         let mut bwd = vec![Vec::new(); ids.len()];
         let mut h = vec![0.0; enc];
         for (t, &id) in ids.iter().enumerate().rev() {
-            h = self.backward.step(&embed(&self.letter_emb, id), &h);
+            h = self.backward.step(&self.embed(&self.letter_emb, id), &h);
             bwd[t] = h.clone();
         }
         let states: Vec<Vec<f32>> = fwd
@@ -185,41 +207,57 @@ impl G2p {
         let mean: Vec<f32> = (0..self.dec)
             .map(|i| states.iter().map(|s| s[i]).sum::<f32>() / states.len() as f32)
             .collect();
-        let mut hidden: Vec<f32> =
-            affine(&self.bridge_w, &self.bridge_b, &mean, self.dec, self.dec)
-                .into_iter()
-                .map(f32::tanh)
-                .collect();
+        let hidden = affine(&self.bridge_w, &self.bridge_b, &mean, self.dec, self.dec)
+            .into_iter()
+            .map(f32::tanh)
+            .collect();
+        (states, hidden)
+    }
+
+    /// One decoder step: logits over phones, the new hidden state and context.
+    fn step(
+        &self,
+        prev: usize,
+        hidden: &[f32],
+        context: &[f32],
+        states: &[Vec<f32>],
+    ) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+        let input = [self.embed(&self.phone_emb, prev), context.to_vec()].concat();
+        let hidden = self.decoder.step(&input, hidden);
+        let scores: Vec<f32> = states
+            .iter()
+            .map(|s| s.iter().zip(&hidden).map(|(a, b)| a * b).sum())
+            .collect();
+        let top = scores.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+        let weights: Vec<f32> = scores.iter().map(|s| (s - top).exp()).collect();
+        let total: f32 = weights.iter().sum();
+        let context: Vec<f32> = (0..self.dec)
+            .map(|i| {
+                states
+                    .iter()
+                    .zip(&weights)
+                    .map(|(s, w)| s[i] * w)
+                    .sum::<f32>()
+                    / total
+            })
+            .collect();
+        let logits = affine(
+            &self.out_w,
+            &self.out_b,
+            &[hidden.clone(), context.clone()].concat(),
+            self.phones.len() + 2,
+            2 * self.dec,
+        );
+        (logits, hidden, context)
+    }
+
+    fn greedy(&self, states: &[Vec<f32>], mut hidden: Vec<f32>) -> Vec<usize> {
         let mut context = vec![0.0; self.dec];
         let mut prev = 1usize;
         let mut out = Vec::new();
         for _ in 0..self.max_phones {
-            let input = [embed(&self.phone_emb, prev), context.clone()].concat();
-            hidden = self.decoder.step(&input, &hidden);
-            let scores: Vec<f32> = states
-                .iter()
-                .map(|s| s.iter().zip(&hidden).map(|(a, b)| a * b).sum())
-                .collect();
-            let top = scores.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-            let weights: Vec<f32> = scores.iter().map(|s| (s - top).exp()).collect();
-            let total: f32 = weights.iter().sum();
-            context = (0..self.dec)
-                .map(|i| {
-                    states
-                        .iter()
-                        .zip(&weights)
-                        .map(|(s, w)| s[i] * w)
-                        .sum::<f32>()
-                        / total
-                })
-                .collect();
-            let logits = affine(
-                &self.out_w,
-                &self.out_b,
-                &[hidden.clone(), context.clone()].concat(),
-                self.phones.len() + 2,
-                2 * self.dec,
-            );
+            let (logits, h, c) = self.step(prev, &hidden, &context, states);
+            (hidden, context) = (h, c);
             prev = logits
                 .iter()
                 .enumerate()
@@ -229,11 +267,82 @@ impl G2p {
             if prev == 1 {
                 break;
             }
-            if prev >= 2 {
-                out.push(self.phones[prev - 2].clone());
+            out.push(prev);
+        }
+        out
+    }
+
+    /// The trainer's beam search, step for step: total log-probability, no
+    /// length penalty, ties keep the earlier hypothesis; a hypothesis ending
+    /// (end or padding) is finished; stop once the best finished one scores
+    /// at least the best still running.
+    fn beam_search(&self, states: &[Vec<f32>], hidden: Vec<f32>) -> Vec<usize> {
+        struct Hyp {
+            score: f64,
+            ids: Vec<usize>,
+            last: usize,
+            hidden: Vec<f32>,
+            context: Vec<f32>,
+        }
+        let mut live = vec![Hyp {
+            score: 0.0,
+            ids: Vec::new(),
+            last: 1,
+            hidden,
+            context: vec![0.0; self.dec],
+        }];
+        let mut done: Vec<Hyp> = Vec::new();
+        for _ in 0..self.max_phones {
+            let mut candidates = Vec::new();
+            for hyp in &live {
+                let (logits, h, c) = self.step(hyp.last, &hyp.hidden, &hyp.context, states);
+                // log_softmax as torch computes it in float32.
+                let top = logits.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+                let lse = top + logits.iter().map(|x| (x - top).exp()).sum::<f32>().ln();
+                let mut ranked: Vec<(f32, usize)> = logits
+                    .iter()
+                    .enumerate()
+                    .map(|(i, x)| (x - lse, i))
+                    .collect();
+                ranked.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.cmp(&b.1)));
+                for &(lp, i) in ranked.iter().take(self.beam) {
+                    let mut ids = hyp.ids.clone();
+                    ids.push(i);
+                    candidates.push(Hyp {
+                        score: hyp.score + f64::from(lp),
+                        ids,
+                        last: i,
+                        hidden: h.clone(),
+                        context: c.clone(),
+                    });
+                }
+            }
+            candidates.sort_by(|a, b| b.score.total_cmp(&a.score)); // stable
+            live.clear();
+            for cand in candidates.into_iter().take(self.beam) {
+                if cand.last <= 1 {
+                    done.push(cand);
+                } else {
+                    live.push(cand);
+                }
+            }
+            let best_done = done
+                .iter()
+                .map(|d| d.score)
+                .fold(f64::NEG_INFINITY, f64::max);
+            if live.is_empty() || (!done.is_empty() && best_done >= live[0].score) {
+                break;
             }
         }
-        (!out.is_empty()).then_some(out)
+        let pool = if done.is_empty() { &live } else { &done };
+        // max() keeps the first of equal scores, as Python's max does.
+        let mut best: Option<&Hyp> = None;
+        for hyp in pool {
+            if best.is_none_or(|b| hyp.score > b.score) {
+                best = Some(hyp);
+            }
+        }
+        best.map(|b| b.ids.clone()).unwrap_or_default()
     }
 }
 

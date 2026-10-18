@@ -216,7 +216,12 @@ impl English {
                 return None;
             }
             if !written_caps.contains(w) {
-                return acronym(w); // NeMo's own capitals: AM, PM, a domain's DE
+                // NeMo's own capitals: AM, PM, a domain's DE — but a domain
+                // ending that is a word (dot APP, dot COM) is read as one.
+                if WORD_DOMAINS.contains(&w.to_lowercase().as_str()) {
+                    return None;
+                }
+                return acronym(w);
             }
             if shouted.contains(w) || w.len() > 3 || SHOUTED_WORDS.contains(&w) {
                 return None; // a headline, NASA from the dictionary, "Download NOW"
@@ -237,14 +242,8 @@ impl English {
                 let overridden = self.overrides.contains_key(&word.to_lowercase());
                 if let Some(pronunciation) = self.overrides.get(&word.to_lowercase()) {
                     out.push_str(pronunciation);
-                } else if let Some(letters) = spelled {
-                    out.push_str(
-                        &letters
-                            .split_whitespace()
-                            .map(phone)
-                            .collect::<Result<Vec<_>, _>>()?
-                            .join(""),
-                    );
+                } else if spelled.is_some() {
+                    out.push_str(&spoken_letters(word).ok_or("cannot spell")?);
                 } else if let Some(Some(phones)) = readings.get(index) {
                     out.push_str(
                         &phones
@@ -282,7 +281,8 @@ impl English {
                         ));
                     }
                 }
-                if american && !overridden {
+                // Spelled letters keep their own stress: "AM" is not the verb.
+                if american && !overridden && spelled.is_none() {
                     let spoken = out.split_off(start);
                     out.push_str(&connected_us(&word.to_lowercase(), &spoken));
                 }
@@ -338,8 +338,17 @@ impl English {
             let lower = written.to_lowercase();
             self.arpabet(&lower)
                 .map(|a| (a, "dictionary"))
+                .or_else(|| self.split_at_apostrophes(&lower).map(|a| (a, "parts")))
                 .or_else(|| self.split_at_capitals(written).map(|a| (a, "parts")))
                 .or_else(|| acronym(written).map(|a| (a, "letters")))
+                // A short lowercase run with no vowel (a URL's /mcp) is initials.
+                .or_else(|| {
+                    ((2..=5).contains(&lower.len())
+                        && !lower.contains(['a', 'e', 'i', 'o', 'u', 'y']))
+                    .then(|| acronym(&lower.to_uppercase()))
+                    .flatten()
+                    .map(|a| (a, "letters"))
+                })
                 .or_else(|| self.compound(&lower).map(|a| (a, "compound")))
                 .or_else(|| {
                     // A full diphthong the model left unstressed (phytotaxa's
@@ -366,7 +375,7 @@ impl English {
                     .filter(|b| b.len() >= 2 && b.chars().all(|c| c.is_ascii_uppercase()))
             })
             .filter(|b| !b.is_empty());
-        let (arpabet, method) = match base {
+        let (arpabet, method, ending) = match base {
             Some(base) => {
                 let (stem, method) = resolve(base)?;
                 let last = stem.split_whitespace().last().unwrap_or_default();
@@ -375,16 +384,32 @@ impl English {
                     "P" | "T" | "K" | "F" | "TH" => "S",
                     _ => "Z",
                 };
-                (format!("{stem} {ending}"), method)
+                (format!("{stem} {ending}"), method, Some(ending))
             }
-            None => resolve(&original)?,
+            None => {
+                let (arpabet, method) = resolve(&original)?;
+                (arpabet, method, None)
+            }
         };
-        let spoken = arpabet
-            .split_whitespace()
-            .map(phone)
-            .collect::<Result<Vec<_>, _>>()
-            .ok()?
-            .join("");
+        let joined = |a: &str| -> Option<String> {
+            Some(
+                a.split_whitespace()
+                    .map(phone)
+                    .collect::<Result<Vec<_>, _>>()
+                    .ok()?
+                    .join(""),
+            )
+        };
+        let spoken = if method == "letters" {
+            // One word per letter, so K D K A's stays four letters.
+            let mut letters = spoken_letters(base.unwrap_or(&original))?;
+            if let Some(ending) = ending {
+                letters.push_str(&joined(ending)?);
+            }
+            letters
+        } else {
+            joined(&arpabet)?
+        };
         let mut guesses = self.guesses.lock().unwrap_or_else(|e| e.into_inner());
         if !guesses.iter().any(|g| g.word == original) {
             guesses.push(Guess {
@@ -399,6 +424,24 @@ impl English {
     /// ARPAbet for a dictionary word, read back from the CMU source form.
     fn arpabet(&self, word: &str) -> Option<String> {
         self.arpabet.get(word).cloned()
+    }
+
+    /// `nor'easter` → noreaster or nor + easter: an inner apostrophe (not a
+    /// possessive) dropped, else each piece a dictionary word.
+    fn split_at_apostrophes(&self, word: &str) -> Option<String> {
+        let inner = word.trim_matches('\'');
+        if !inner.contains('\'') || word.ends_with("'s") {
+            return None;
+        }
+        if let Some(whole) = self.arpabet(&inner.replace('\'', "")) {
+            return Some(whole);
+        }
+        let parts: Option<Vec<String>> = inner
+            .split('\'')
+            .filter(|p| !p.is_empty())
+            .map(|p| self.arpabet(p))
+            .collect();
+        parts.filter(|p| p.len() >= 2).map(|p| p.join(" "))
     }
 
     /// `PromoShot` → promo + shot, `ChatGPT` → chat + G P T: split where the
@@ -545,6 +588,37 @@ const SHOUTED_WORDS: &[&str] = &[
     "WHO", "ARE", "CAN", "HAS", "HAD", "WAS", "LET", "SET", "RUN", "FAN", "BOX", "SIX", "RED",
     "WON", "OWN", "USE", "ASK", "ART", "APP", "JOB", "MAP", "TIP", "YET", "NOR", "BUT",
 ];
+
+/// Domain endings read as words even when NeMo capitalizes them (dot APP).
+const WORD_DOMAINS: &[&str] = &[
+    "com", "net", "org", "app", "dev", "edu", "gov", "info", "biz", "shop", "store", "blog",
+    "tech", "site", "online", "cloud", "art", "design", "news", "live", "page", "studio",
+];
+
+/// A word spelled letter by letter, as Kokoro phonemes: one word per
+/// letter, so a spelled "AM" after "nineteen" stays two letters instead of
+/// slurring into one syllable.
+fn spoken_letters(word: &str) -> Option<String> {
+    let letters = acronym(&word.to_uppercase().replace('\'', ""))?;
+    let mut out = Vec::new();
+    let mut current = String::new();
+    // acronym() writes each letter's phones in order; split them back by letter.
+    let mut names = word
+        .to_uppercase()
+        .replace('\'', "")
+        .into_bytes()
+        .into_iter();
+    let mut remaining: Vec<&str> = letters.split_whitespace().collect();
+    remaining.reverse();
+    for b in names.by_ref() {
+        let count = LETTER_NAMES[(b - b'A') as usize].split_whitespace().count();
+        for _ in 0..count {
+            current.push_str(&phone(remaining.pop()?).ok()?);
+        }
+        out.push(std::mem::take(&mut current));
+    }
+    Some(out.join(" "))
+}
 
 /// Letter names in ARPAbet, for spelling an acronym.
 const LETTER_NAMES: [&str; 26] = [
@@ -757,7 +831,10 @@ mod tests {
         let spoken = frontend
             .phonemize("Meet PromoShot, ChatGPT, the SDK and screenrecorder, by Figma.")
             .unwrap();
-        assert!(spoken.contains("ˌɛsdˌikˈA"), "SDK spelled: {spoken}");
+        assert!(
+            spoken.contains("ˌɛs dˌi kˈA"),
+            "SDK spelled letter by letter: {spoken}"
+        );
         let guesses = frontend.take_guesses();
         let by_word = |w: &str| guesses.iter().find(|g| g.word == w).unwrap().clone();
         assert_eq!(by_word("PromoShot").arpabet, "P R OW1 M OW0 SH AA1 T");
@@ -801,5 +878,27 @@ mod tests {
         assert!(strict.phonemize("news at 3 p.m.").is_err());
         strict.set_fallback(true).unwrap();
         assert!(strict.phonemize("news at 3 p.m.").is_ok());
+    }
+    #[test]
+    fn spelled_letters_stay_separate_and_apostrophes_split() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cmudict.dict");
+        std::fs::write(
+            &path,
+            "am AE1 M\nat AE1 T\nnor N AO1 R\neaster IY1 S T ER0\nfive F AY1 V\n",
+        )
+        .unwrap();
+        let mut frontend = English::load(&path).unwrap();
+        frontend.set_fallback(true).unwrap();
+        // NeMo writes "five AM": the letters A M, stressed, not the verb "am".
+        let spoken = frontend.phonemize_american("at 5 a.m.").unwrap();
+        assert!(spoken.ends_with("ˌA ˈɛm"), "{spoken}");
+        frontend.phonemize("a nor'easter").unwrap();
+        let guess = frontend
+            .take_guesses()
+            .into_iter()
+            .find(|g| g.word == "nor'easter")
+            .unwrap();
+        assert_eq!(guess.arpabet, "N AO1 R IY1 S T ER0");
     }
 }

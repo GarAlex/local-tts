@@ -4,13 +4,15 @@
 //! - Accented Latin letters lose their marks: Kīlauea → Kilauea, ß → ss
 //!   (NeMo passes them through, and the dictionary spells without them).
 //! - Multipliers: 2.5x and 10× → 2.5 times, 10 times (NeMo reads "x").
+//! - Web addresses lose `https://` and `www.`: narration says "promoshot
+//!   dot app slash docs", where NeMo would read the scheme out in full.
 //! - Roman numerals after a word that introduces a number: Chapter IV,
 //!   World War II, Super Bowl LVIII → digits, which NeMo reads (its cased
 //!   English grammars leave Roman numerals as written).
 use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
 
 pub(crate) fn prepare(text: &str) -> String {
-    let folded = numbered_roman(&fold(text));
+    let folded = numbered_roman(&spoken_urls(&fold(text)));
     let chars: Vec<char> = folded.chars().collect();
     let mut out = String::with_capacity(folded.len());
     let mut i = 0;
@@ -26,6 +28,31 @@ pub(crate) fn prepare(text: &str) -> String {
         i += 1;
     }
     out
+}
+
+/// `https://www.promoshot.app/docs/` → `promoshot.app/docs`.
+fn spoken_urls(text: &str) -> String {
+    text.split(' ')
+        .map(|word| {
+            let lower = word.to_ascii_lowercase();
+            let mut rest = word;
+            for scheme in ["https://", "http://"] {
+                if lower.starts_with(scheme) {
+                    rest = &word[scheme.len()..];
+                }
+            }
+            if rest.to_ascii_lowercase().starts_with("www.") && rest.len() > 4 {
+                rest = &rest[4..];
+            }
+            if rest.len() == word.len() {
+                return word.to_string();
+            }
+            // A trailing slash says nothing aloud; keep sentence punctuation.
+            let core = rest.trim_end_matches(|c: char| ",.;:!?)".contains(c));
+            format!("{}{}", core.trim_end_matches('/'), &rest[core.len()..])
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Words after which a Roman numeral is a number.
@@ -177,6 +204,10 @@ mod tests {
         assert_eq!(
             prepare("Chapter IV, World War II and Super Bowl LVIII."),
             "Chapter 4, World War 2 and Super Bowl 58."
+        );
+        assert_eq!(
+            prepare("Visit https://www.promoshot.app/docs/, or http://example.com."),
+            "Visit promoshot.app/docs, or example.com."
         );
         for keep in [
             "0x1f",
