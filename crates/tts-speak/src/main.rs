@@ -359,6 +359,7 @@ fn packages(
         return Err("--mirror requires --install".into());
     }
     let installed = dir.map(catalog::installed).unwrap_or_default();
+    let outdated = dir.map(catalog::outdated).unwrap_or_default();
     let listing: Vec<_> = catalog::catalog()
         .iter()
         .map(|p| {
@@ -371,6 +372,7 @@ fn packages(
                 "source": p.source,
                 "downloadBytes": p.download_bytes(),
                 "installed": installed.contains(&p.id),
+                "complete": installed.contains(&p.id) && !outdated.contains(&p.id),
             })
         })
         .collect();
@@ -400,6 +402,15 @@ fn list_voices(backend: &str, model: Option<&Path>) -> Result<String, String> {
             let manifest = vits_manifest(needs_model()?)?;
             (manifest.speakers, vec![manifest.language.code().into()])
         }
+        // With --model, the voices that package has; without, every pinned one.
+        "kokoro" => (
+            local_tts_core::kokoro::voices()
+                .into_iter()
+                .filter(|v| model.is_none_or(|m| m.join(format!("{}.bin", v.name)).is_file()))
+                .map(|v| v.name)
+                .collect(),
+            vec!["en".into()],
+        ),
         "vosk" => (
             local_tts_core::vosk::SPEAKERS.map(String::from).to_vec(),
             vec!["ru".into()],
@@ -427,10 +438,20 @@ fn list_voices(backend: &str, model: Option<&Path>) -> Result<String, String> {
         "vits" => voices.first().map(String::as_str),
         _ => Some(default_speaker(backend)),
     };
+    let details: Vec<_> = if backend == "kokoro" {
+        local_tts_core::kokoro::voices()
+            .into_iter()
+            .filter(|v| voices.contains(&v.name))
+            .map(|v| serde_json::json!({ "name": v.name, "accent": v.accent, "gender": v.gender, "grade": v.grade }))
+            .collect()
+    } else {
+        Vec::new()
+    };
     Ok(serde_json::json!({
         "backend": backend,
         "default": default,
         "voices": voices,
+        "details": details,
         "languages": languages,
         "lexicon": LEXICON_BACKENDS.contains(&backend),
     })

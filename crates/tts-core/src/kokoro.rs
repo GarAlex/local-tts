@@ -53,11 +53,62 @@ impl Variant {
     }
 }
 
+/// The voice every Kokoro package has; the others are optional files.
+pub const DEFAULT_VOICE: &str = "af_heart";
+
+/// One pinned English voice style (`<name>.bin` in a package folder).
+#[derive(Clone, Debug)]
+pub struct KokoroVoice {
+    pub name: String,
+    /// `us` or `gb`. The text frontend is American for both.
+    pub accent: String,
+    pub gender: String,
+    /// Upstream's own listening grade, A best.
+    pub grade: String,
+    pub url: String,
+    pub sha256: String,
+    pub bytes: u64,
+}
+
+/// Every pinned English voice, the default first, then by grade order of
+/// the upstream list.
+pub fn voices() -> Vec<KokoroVoice> {
+    let doc: serde_json::Value =
+        serde_json::from_str(include_str!("../../../assets/kokoro-voices.json"))
+            .expect("bundled Kokoro voice pins are valid");
+    let mut voices: Vec<KokoroVoice> = doc["voices"]
+        .as_object()
+        .expect("voices object")
+        .iter()
+        .map(|(name, v)| KokoroVoice {
+            name: name.clone(),
+            accent: v["accent"].as_str().unwrap_or_default().into(),
+            gender: v["gender"].as_str().unwrap_or_default().into(),
+            grade: v["grade"].as_str().unwrap_or_default().into(),
+            url: v["url"].as_str().unwrap_or_default().into(),
+            sha256: v["sha256"].as_str().unwrap_or_default().into(),
+            bytes: v["bytes"].as_u64().unwrap_or_default(),
+        })
+        .collect();
+    voices.sort_by_key(|v| (v.name != DEFAULT_VOICE, v.accent != "us", v.name.clone()));
+    voices
+}
+
+fn parse_style(bytes: &[u8]) -> Result<Vec<f32>, String> {
+    if !bytes.len().is_multiple_of(256 * 4) || bytes.len() < 256 * 4 {
+        return Err("invalid voice style data".into());
+    }
+    Ok(bytes
+        .chunks_exact(4)
+        .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
+        .collect())
+}
+
 pub struct Kokoro {
     variant: Variant,
     session: Session,
     vocab: HashMap<char, i64>,
-    styles: Vec<f32>,
+    styles: HashMap<String, Vec<f32>>,
     frontend: English,
 }
 
@@ -96,14 +147,28 @@ impl Kokoro {
                 }
                 vocab.insert(c, id.as_i64().ok_or("invalid token id")?);
             }
-            let bytes = std::fs::read(root.join("af_heart.bin"))?;
-            if bytes.len() % (256 * 4) != 0 || bytes.len() < 256 * 4 {
-                return Err("invalid voice style data".into());
+            let mut styles = HashMap::new();
+            styles.insert(
+                DEFAULT_VOICE.to_string(),
+                parse_style(&std::fs::read(root.join("af_heart.bin"))?)
+                    .map_err(std::io::Error::other)?,
+            );
+            // Further voices are optional; one that is present must match
+            // its pin, so a tampered or truncated file never loads.
+            for voice in voices().into_iter().filter(|v| v.name != DEFAULT_VOICE) {
+                let file = format!("{}.bin", voice.name);
+                if !root.join(&file).is_file() {
+                    continue;
+                }
+                let pin = std::collections::BTreeMap::from([(file.clone(), voice.sha256.clone())]);
+                crate::integrity::verify(root, &pin, &[file.as_str()])
+                    .map_err(std::io::Error::other)?;
+                styles.insert(
+                    voice.name.clone(),
+                    parse_style(&std::fs::read(root.join(&file))?)
+                        .map_err(std::io::Error::other)?,
+                );
             }
-            let styles = bytes
-                .chunks_exact(4)
-                .map(|b| f32::from_le_bytes(b.try_into().unwrap()))
-                .collect();
             Ok(Self {
                 variant,
                 session: Session::builder()?
@@ -122,8 +187,30 @@ impl Kokoro {
         self.variant
     }
 
+    /// The voices this package has installed, the default first.
+    pub fn speakers(&self) -> Vec<String> {
+        voices()
+            .into_iter()
+            .map(|v| v.name)
+            .filter(|name| self.styles.contains_key(name))
+            .collect()
+    }
+
     pub fn phonemize(&self, text: &str) -> Result<String, Error> {
         self.frontend.phonemize_american(text).map_err(Error)
+    }
+
+    fn unknown_speaker(&self, speaker: &str) -> Error {
+        if voices().iter().any(|v| v.name == speaker) {
+            Error(format!(
+                "Kokoro voice {speaker} is not installed in this package; reinstall it to add every pinned voice"
+            ))
+        } else {
+            Error(format!(
+                "unknown Kokoro voice {speaker}; installed: {}",
+                self.speakers().join(", ")
+            ))
+        }
     }
 
     /// Adds CMU-format user pronunciations; see [`English::add_lexicon`].
@@ -131,8 +218,18 @@ impl Kokoro {
         self.frontend.add_lexicon(path).map_err(Error)
     }
 
+    /// Phonemes in the default voice.
     pub fn synthesize_phonemes(
         &mut self,
+        phonemes: &str,
+        duration_scale: f32,
+    ) -> Result<Audio, Error> {
+        self.synthesize_phonemes_as(DEFAULT_VOICE, phonemes, duration_scale)
+    }
+
+    pub fn synthesize_phonemes_as(
+        &mut self,
+        speaker: &str,
         phonemes: &str,
         duration_scale: f32,
     ) -> Result<Audio, Error> {
@@ -156,6 +253,8 @@ impl Kokoro {
         let row = tokens.len() - 1;
         let style = self
             .styles
+            .get(speaker)
+            .ok_or_else(|| self.unknown_speaker(speaker))?
             .get(row * 256..(row + 1) * 256)
             .ok_or_else(|| Error("voice style row unavailable".into()))?
             .to_vec();
@@ -195,10 +294,11 @@ impl Kokoro {
         cancel: &std::sync::atomic::AtomicBool,
     ) -> Result<Audio, Error> {
         crate::paragraph::check_cancel(cancel).map_err(Error)?;
-        if request.language != Language::En || request.speaker != "af_heart" {
-            return Err(Error(
-                "this package supports English / af_heart only".into(),
-            ));
+        if request.language != Language::En {
+            return Err(Error("Kokoro packages support English only".into()));
+        }
+        if !self.styles.contains_key(request.speaker) {
+            return Err(self.unknown_speaker(request.speaker));
         }
         if request.text.chars().count() > 10000 {
             return Err(Error("text exceeds 10000 characters".into()));
@@ -210,7 +310,7 @@ impl Kokoro {
             crate::paragraph::check_cancel(cancel).map_err(Error)?;
             crate::paragraph::append(
                 &mut output,
-                self.synthesize_phonemes(&chunk, request.duration_scale)?,
+                self.synthesize_phonemes_as(request.speaker, &chunk, request.duration_scale)?,
             )
             .map_err(Error)?;
         }

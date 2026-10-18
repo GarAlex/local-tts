@@ -88,9 +88,16 @@ tts-speak --remove kokoro-en-q8 --voices-dir ~/voices
 
 | Package | Backend | Download | Voices |
 |---|---|---|---|
-| `kokoro-en-q8` | kokoro | 92 MB | af_heart |
+| `kokoro-en-q8` | kokoro | 106 MB | 28: 20 American, 8 British (`--list-voices --backend kokoro` lists them with grades) |
 | `kitten-nano-en` | kitten | 31 MB | 8 (Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, Leo) |
 | `inflect-nano-en` | inflect | 20 MB | 1 |
+
+Kokoro's voices are small style files (0.5 MB each) over one shared model;
+upstream grades them A–F by listening — `af_heart` (A) and `af_bella` (A-) are
+the best, the British voices read with the American frontend's pronunciation.
+Running `--install kokoro-en-q8` over an older install that has `af_heart` only
+downloads just the missing voices, and `--catalog` shows `"complete": false`
+until then.
 
 `--mirror URL` tries `URL/<id>/<file>` first and falls back to the pinned URL;
 the checksum decides either way. Library users enable the `download` feature

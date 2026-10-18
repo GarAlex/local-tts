@@ -94,9 +94,15 @@ fn catalog_inner() -> Result<Vec<Package>, String> {
         "model.onnx".into(),
         serde_json::json!({ "url": q8["url"], "sha256": q8["sha256"], "bytes": q8["bytes"] }),
     );
+    for voice in crate::kokoro::voices() {
+        let name = format!("{}.bin", voice.name);
+        kokoro.entry(name).or_insert_with(|| {
+            serde_json::json!({ "url": voice.url, "sha256": voice.sha256, "bytes": voice.bytes })
+        });
+    }
     let mut packages = vec![Package {
         id: "kokoro-en-q8",
-        title: "Kokoro English (Q8) — af_heart",
+        title: "Kokoro English (Q8) — 28 US and UK voices",
         backend: "kokoro",
         languages: &["en"],
         license: "Apache-2.0 (weights), BSD (CMU dictionary)",
@@ -225,24 +231,34 @@ fn install_with(
 ) -> Result<PathBuf, String> {
     let package = package(id)?;
     let target = voices_dir.join(package.id);
-    if target.join(MARKER).is_file() {
-        return Ok(target);
-    }
-    if target.exists() {
+    // An installed package is completed, not replaced: files this release
+    // pins that an older install lacks (more Kokoro voices) are fetched and
+    // verified on their own; what is already there is never downloaded again.
+    let upgrade = target.join(MARKER).is_file();
+    if !upgrade && target.exists() {
         return Err(format!(
             "{} exists but is not an installed package; move it aside first",
             target.display()
         ));
+    }
+    let wanted: Vec<&PackageFile> = package
+        .files
+        .iter()
+        .filter(|f| f.url.is_some())
+        .filter(|f| !upgrade || (!f.acquisition_only && !target.join(&f.name).is_file()))
+        .collect();
+    if upgrade && wanted.is_empty() {
+        return Ok(target);
     }
     std::fs::create_dir_all(voices_dir).map_err(|e| format!("{}: {e}", voices_dir.display()))?;
     let stage = tempfile::Builder::new()
         .prefix(&format!(".{}.", package.id))
         .tempdir_in(voices_dir)
         .map_err(|e| e.to_string())?;
-    let total = package.download_bytes();
+    let total: u64 = wanted.iter().filter_map(|f| f.bytes).sum();
     let mut done = 0u64;
     progress(0, total);
-    for file in package.files.iter().filter(|f| f.url.is_some()) {
+    for file in wanted.iter().copied() {
         let destination = stage.path().join(&file.name);
         if let Some(parent) = destination.parent() {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
@@ -273,20 +289,22 @@ fn install_with(
             return Err(format!("{}: {last_error}", file.name));
         }
     }
-    for file in package.files.iter().filter(|f| f.derived_from.is_some()) {
-        let archive = stage
-            .path()
-            .join(file.derived_from.as_deref().unwrap_or_default());
-        let bytes = extract_npy(&archive, &file.name)?;
-        check(&bytes, file)?;
-        let destination = stage.path().join(&file.name);
-        if let Some(parent) = destination.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    if !upgrade {
+        for file in package.files.iter().filter(|f| f.derived_from.is_some()) {
+            let archive = stage
+                .path()
+                .join(file.derived_from.as_deref().unwrap_or_default());
+            let bytes = extract_npy(&archive, &file.name)?;
+            check(&bytes, file)?;
+            let destination = stage.path().join(&file.name);
+            if let Some(parent) = destination.parent() {
+                std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            }
+            std::fs::write(&destination, bytes).map_err(|e| e.to_string())?;
         }
-        std::fs::write(&destination, bytes).map_err(|e| e.to_string())?;
-    }
-    for file in package.files.iter().filter(|f| f.acquisition_only) {
-        let _ = std::fs::remove_file(stage.path().join(&file.name));
+        for file in package.files.iter().filter(|f| f.acquisition_only) {
+            let _ = std::fs::remove_file(stage.path().join(&file.name));
+        }
     }
     let record = serde_json::json!({
         "id": package.id,
@@ -298,17 +316,47 @@ fn install_with(
             "name": f.name, "url": f.url, "sha256": f.sha256, "derivedFrom": f.derived_from,
         })).collect::<Vec<_>>(),
     });
-    std::fs::write(
-        stage.path().join(MARKER),
-        serde_json::to_vec_pretty(&record).map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
+    let record = serde_json::to_vec_pretty(&record).map_err(|e| e.to_string())?;
+    if upgrade {
+        // Each verified file moves in; the marker is rewritten last, so an
+        // interrupted upgrade leaves the old, working package plus extras.
+        for file in &wanted {
+            let destination = target.join(&file.name);
+            if let Some(parent) = destination.parent() {
+                std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            }
+            std::fs::rename(stage.path().join(&file.name), &destination)
+                .map_err(|e| format!("{}: {e}", destination.display()))?;
+        }
+        let marker = stage.path().join(MARKER);
+        std::fs::write(&marker, record).map_err(|e| e.to_string())?;
+        std::fs::rename(&marker, target.join(MARKER)).map_err(|e| e.to_string())?;
+        return Ok(target);
+    }
+    std::fs::write(stage.path().join(MARKER), record).map_err(|e| e.to_string())?;
     let staged = stage.keep();
     std::fs::rename(&staged, &target).map_err(|e| {
         let _ = std::fs::remove_dir_all(&staged);
         format!("{}: {e}", target.display())
     })?;
     Ok(target)
+}
+
+/// Installed packages whose folder lacks files this release pins — an
+/// install of the same id completes them.
+pub fn outdated(voices_dir: &Path) -> Vec<&'static str> {
+    catalog()
+        .into_iter()
+        .filter(|p| voices_dir.join(p.id).join(MARKER).is_file())
+        .filter(|p| {
+            p.files.iter().any(|f| {
+                f.url.is_some()
+                    && !f.acquisition_only
+                    && !voices_dir.join(p.id).join(&f.name).is_file()
+            })
+        })
+        .map(|p| p.id)
+        .collect()
 }
 
 fn fetch_verified(
@@ -404,6 +452,12 @@ mod tests {
         assert!(kokoro.files.iter().any(|f| f.name == "model.onnx"
             && f.url.as_deref().unwrap().ends_with("model_quantized.onnx")));
         assert!(kokoro.download_bytes() > 90_000_000);
+        let voices = kokoro
+            .files
+            .iter()
+            .filter(|f| f.name.ends_with(".bin"))
+            .count();
+        assert_eq!(voices, 28, "every pinned English Kokoro voice");
         assert!(package("missing").is_err());
     }
 
@@ -508,6 +562,27 @@ mod tests {
             crate::compact_english::CompactKind::Inflect,
         )
         .unwrap();
+        // An install with a file missing completes it, fetching only that file.
+        std::fs::remove_file(path.join("config.json")).unwrap();
+        assert_eq!(outdated(dir.path()), ["inflect-nano-en"]);
+        let calls = std::sync::atomic::AtomicUsize::new(0);
+        let inner = fake(served_inflect(None));
+        let counting = |url: &str| {
+            calls.fetch_add(1, Ordering::Relaxed);
+            inner(url)
+        };
+        install_with(
+            "inflect-nano-en",
+            dir.path(),
+            None,
+            &mut |_, _| {},
+            &AtomicBool::new(false),
+            &counting,
+        )
+        .unwrap();
+        assert_eq!(calls.load(Ordering::Relaxed), 1);
+        assert!(path.join("config.json").is_file());
+        assert!(outdated(dir.path()).is_empty());
         assert!(remove("inflect-nano-en", dir.path()).unwrap());
         assert!(installed(dir.path()).is_empty());
     }
