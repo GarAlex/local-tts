@@ -114,6 +114,25 @@ impl Vits {
         };
         load().map_err(|e| Error(e.to_string()))
     }
+    /// Guess words the dictionary lacks (English CMU IPA voices only).
+    pub fn set_fallback(&mut self, enabled: bool) -> Result<(), Error> {
+        self.dictionary
+            .as_mut()
+            .ok_or_else(|| {
+                Error("the unknown-word fallback requires an English CMU IPA voice".into())
+            })?
+            .set_fallback(enabled)
+            .map_err(Error)
+    }
+
+    /// What the fallback guessed since the last call.
+    pub fn take_guesses(&self) -> Vec<crate::english::Guess> {
+        self.dictionary
+            .as_ref()
+            .map(|d| d.take_guesses())
+            .unwrap_or_default()
+    }
+
     /// Adds CMU-format user pronunciations to an English CMU IPA voice.
     pub fn add_lexicon(&mut self, path: &Path) -> Result<usize, Error> {
         self.dictionary

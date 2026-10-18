@@ -29,6 +29,7 @@ Usage: tts-speak --model FOLDER --output FILE.wav [options]
   --reference FILE.wav | --profile FOLDER              (Chatterbox only)
   --description TEXT                                  (required for qwen-design)
   --lexicon FILE                                      CMU-format extra words (English kokoro/inflect/kitten/vits)
+  --guess-unknown                                     guess words the dictionary lacks, and list the guesses
   --json                                              print a JSON result on stdout
   --list-voices                                       print the backend's speakers/languages as JSON
                                                       (--model required for piper and vits)
@@ -62,7 +63,15 @@ fn run(args: Vec<String>) -> Result<(), String> {
     let mut flags = std::collections::BTreeSet::new();
     let mut iter = args.into_iter();
     while let Some(key) = iter.next() {
-        if ["--force", "--json", "--list-voices", "--catalog"].contains(&key.as_str()) {
+        if [
+            "--force",
+            "--json",
+            "--list-voices",
+            "--catalog",
+            "--guess-unknown",
+        ]
+        .contains(&key.as_str())
+        {
             if !flags.insert(key.clone()) {
                 return Err(format!("duplicate {key}"));
             }
@@ -154,6 +163,11 @@ fn run(args: Vec<String>) -> Result<(), String> {
     if lexicon.is_some() && !LEXICON_BACKENDS.contains(&backend) {
         return Err("lexicon requires kokoro, inflect, kitten or vits".into());
     }
+    let guess_unknown = flags.contains("--guess-unknown");
+    if guess_unknown && !LEXICON_BACKENDS.contains(&backend) {
+        return Err("--guess-unknown requires kokoro, inflect, kitten or vits".into());
+    }
+    let mut guesses: Vec<local_tts_core::english::Guess> = Vec::new();
     let language: Language = get("--language")
         .unwrap_or("en")
         .parse()
@@ -230,7 +244,12 @@ fn run(args: Vec<String>) -> Result<(), String> {
             if let Some(path) = lexicon {
                 with_lexicon(engine.add_lexicon(path))?;
             }
-            engine.synthesize(&request).map_err(|e| e.to_string())?
+            if guess_unknown {
+                engine.set_fallback(true).map_err(|e| e.to_string())?;
+            }
+            let audio = engine.synthesize(&request).map_err(|e| e.to_string())?;
+            guesses = engine.take_guesses();
+            audio
         }
         "kokoro" => {
             let mut engine =
@@ -238,7 +257,12 @@ fn run(args: Vec<String>) -> Result<(), String> {
             if let Some(path) = lexicon {
                 with_lexicon(engine.add_lexicon(path))?;
             }
-            engine.synthesize(&request).map_err(|e| e.to_string())?
+            if guess_unknown {
+                engine.set_fallback(true).map_err(|e| e.to_string())?;
+            }
+            let audio = engine.synthesize(&request).map_err(|e| e.to_string())?;
+            guesses = engine.take_guesses();
+            audio
         }
         "vosk" => local_tts_core::vosk::Vosk::load(model)
             .map_err(|e| e.to_string())?
@@ -253,7 +277,12 @@ fn run(args: Vec<String>) -> Result<(), String> {
             if let Some(path) = lexicon {
                 with_lexicon(engine.add_lexicon(path))?;
             }
-            engine.synthesize(&request).map_err(|e| e.to_string())?
+            if guess_unknown {
+                engine.set_fallback(true).map_err(|e| e.to_string())?;
+            }
+            let audio = engine.synthesize(&request).map_err(|e| e.to_string())?;
+            guesses = engine.take_guesses();
+            audio
         }
         "chatterbox" => {
             let mut engine = if let Some(profile) = get("--profile") {
@@ -301,7 +330,19 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 "backend": backend,
                 "language": language.code(),
                 "speaker": speaker,
+                "guessed": guesses.iter().map(|g| serde_json::json!({
+                    "word": g.word, "arpabet": g.arpabet, "method": g.method,
+                })).collect::<Vec<_>>(),
             })
+        );
+    }
+    for guess in &guesses {
+        // Lexicon-ready: paste the line into --lexicon to keep or correct it.
+        eprintln!(
+            "guessed ({}): {}  {}",
+            guess.method,
+            guess.word.to_uppercase(),
+            guess.arpabet
         );
     }
     eprintln!(

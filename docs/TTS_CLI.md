@@ -61,6 +61,18 @@ macOS      M AE1 K OW0 EH2 S
 Words may contain only ASCII letters and apostrophes; symbols such as `&`, `…`
 or `/` and words with digits (`MP4`) still need spelling out in the text.
 
+`--guess-unknown` makes words the dictionary lacks speakable instead of
+refusing them, in this order: split at capitals into known words (`PromoShot`,
+`ChatGPT`, `CloudKit`), spell 2–5 letter capitals not already expanded by the
+normalizer (`SDK`), split run-together known words (`screenrecorder`), and
+otherwise ask a small grapheme-to-phoneme model (`assets/g2p-en-v1.bin`, 5.9 MB,
+bundled — no download). The model was trained here only on the BSD CMU
+dictionary (`training/g2p/train_g2p.py`); on 3,101 held-out dictionary words it
+gets 31.7% of words wrong in some phone or stress and 8.5% of phones wrong, so
+treat its guesses as drafts. Every guess is printed to stderr as a lexicon line,
+and `--json` lists them under `"guessed"`: pin or correct one with `--lexicon`.
+Without the flag, unknown words still fail exactly as before.
+
 `--json` prints one line on stdout after the WAV is committed:
 `{"output","format":"wav","seconds","sampleRate","backend","language","speaker"}`.
 Errors stay on stderr with exit 1.

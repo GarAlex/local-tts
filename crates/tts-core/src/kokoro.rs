@@ -213,6 +213,16 @@ impl Kokoro {
         }
     }
 
+    /// Guess words the dictionary lacks; see [`English::set_fallback`].
+    pub fn set_fallback(&mut self, enabled: bool) -> Result<(), Error> {
+        self.frontend.set_fallback(enabled).map_err(Error)
+    }
+
+    /// What the fallback guessed since the last call.
+    pub fn take_guesses(&self) -> Vec<crate::english::Guess> {
+        self.frontend.take_guesses()
+    }
+
     /// Adds CMU-format user pronunciations; see [`English::add_lexicon`].
     pub fn add_lexicon(&mut self, path: &Path) -> Result<usize, Error> {
         self.frontend.add_lexicon(path).map_err(Error)

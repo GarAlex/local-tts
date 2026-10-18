@@ -16,6 +16,7 @@ pub mod english;
 pub mod english_numbers;
 pub mod evaluation;
 pub mod frontend;
+pub mod g2p;
 pub mod integrity;
 pub mod kokoro;
 pub mod languages;
