@@ -98,3 +98,19 @@ notice and Kitten's Apache license are retained in assets/compact-notices and
 included in release notices. CMU dictionary assets retain their BSD license.
 Models retain their own downloaded licenses/attribution. See COMPACT_ENGLISH.md;
 this native frontend does not reproduce the publishers' eSpeak-ng pipeline.
+
+## NeMo English text normalization
+
+Narration mode (`English::set_fallback(true)`, `tts-speak --guess-unknown`,
+PromoShot's local voices) normalizes text with NVIDIA NeMo-text-processing's
+English grammars, release r1.2.0 (nemo_text_processing 1.2.0, Apache-2.0;
+https://github.com/NVIDIA/NeMo-text-processing). `training/nemo/build_grammars.sh`
+compiles them with pynini 2.1.6.post1 (Apache-2.0) in a pinned container and
+exports three OpenFst transducers to `assets/nemo-en-tn/` (1.1 MB gzipped),
+pinned by SHA-256 in its `manifest.json`; NeMo's licence is kept beside them as
+`assets/nemo-en-tn/LICENSE`. They run natively through the `rustfst` crate
+(MIT or Apache-2.0); no Python, OpenFst or pynini code is linked. The grammars
+are derived works of NeMo's Apache-2.0 sources and are redistributed under the
+same licence. `assets/nemo-en-tn/reference.json` holds NeMo's English TN test
+cases with Python NeMo's outputs, the parity target for the native runner.
+

@@ -161,3 +161,37 @@ The language catalogue also accepts de/fr/es/it/pt/pl/nl. Their initial text pat
 uses NFC Unicode and lowercase graphemes, preserving accents and ligatures.
 Write numeric forms and abbreviations as spoken words; structured expansion and
 context rules above remain EN/RU/UK-only. See [French and European guide](FRENCH.md).
+
+## Narration mode (NeMo)
+
+`English::set_fallback(true)` — `tts-speak --guess-unknown`, and PromoShot's
+local voices — switches English text normalization from the strict, versioned
+text-v1 contract to NVIDIA NeMo's English text-normalization grammars
+(r1.2.0, deterministic, cased), compiled once by `training/nemo/build_grammars.sh`
+and run natively by `crate::nemo`. Trained VITS voices keep text-v1 unless the
+mode is switched on.
+
+The pipeline: accented Latin letters are folded (Kīlauea → Kilauea);
+multipliers (2.5x → 2.5 times) and Roman numerals after a numbering word
+(Chapter IV, World War II, Super Bowl LVIII) are rewritten, because NeMo's cased
+English grammars leave both as written; NeMo normalizes a sentence at a time;
+then each word is read from the user lexicon, the dictionary, or the
+unknown-word fallback. All-capital tokens NeMo produced (AM, PM) are spelled,
+as are short isolated ones the text wrote (EST, CEO, the IT team), unless they
+are common words shouted for emphasis (Download NOW) or part of an all-caps
+headline; longer ones (NASA) are read from the dictionary. Symbols NeMo leaves
+become a pause rather than an error.
+
+Parity: on NeMo's 494 English test cases the native runner's output is
+identical to Python NeMo's on 492; the two others are punctuation pile-ups
+(`U.S.A..`, `4A.M.?-34`) where equally weighted paths break differently.
+Python NeMo matches the cases' expected answers on 490, the native runner on 488.
+A typical sentence normalizes in under 20 ms on an M4 Pro; loading the grammars
+takes about 10 ms, once per process.
+
+Known NeMo gaps, as of r1.2.0: a score such as 112-108 is read as a range
+("one hundred and twelve, one hundred and eight"); `5 kg camera` reads
+"five kilograms camera"; `km/h` reads "kilometers per H"; domains are read
+as words or letters by NeMo's own rules (promoshot dot app). These are
+NeMo's behaviour, and the place to fix them is NeMo's grammars.
+

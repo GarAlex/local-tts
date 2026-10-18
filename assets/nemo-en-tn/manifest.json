@@ -1,0 +1,26 @@
+{
+  "nemo_text_processing": "1.2.0",
+  "pynini": "2.1.6.post1",
+  "source": "https://github.com/NVIDIA/NeMo-text-processing/tree/r1.2.0",
+  "config": {
+    "lang": "en",
+    "input_case": "cased",
+    "deterministic": true
+  },
+  "files": {
+    "classify": {
+      "sha256": "ff92a2fbcf70172b3efa838c9323fca7416bb6150d62a26f62407a5e0744a802",
+      "bytes": 7455506
+    },
+    "verbalize": {
+      "sha256": "673eaa62bdf8105749ac08a83a7ee0533e987a852eaf2f8dad213db99213cda7",
+      "bytes": 1562142
+    },
+    "post": {
+      "sha256": "a48df1cbccac49eda8a004fcae6afb69933b919dcaf6ed43a081880fa4f9ab49",
+      "bytes": 329214
+    }
+  },
+  "reference_cases": 494,
+  "python_matches_expected": 490
+}

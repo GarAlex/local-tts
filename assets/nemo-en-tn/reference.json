@@ -1,0 +1,2966 @@
+[
+{
+"kind": "address",
+"written": "2788 San Tomas Expy, Santa Clara, CA 95051",
+"expected": "twenty seven eighty eight San Tomas Expressway, Santa Clara, California nine five zero five one",
+"python": "twenty seven eighty eight San Tomas Expressway, Santa Clara, California nine five zero five one"
+},
+{
+"kind": "address",
+"written": "2 San Tomas hwy, Santa, FL, 95051",
+"expected": "two San Tomas Highway, Santa, Florida, nine five zero five one",
+"python": "two San Tomas Highway, Santa, Florida, nine five zero five one"
+},
+{
+"kind": "address",
+"written": "123 Smth St, City, NY",
+"expected": "one twenty three Smth Street, City, New York",
+"python": "one twenty three Smth Street, City, New York"
+},
+{
+"kind": "address",
+"written": "123 Laguna Ct, Town",
+"expected": "one twenty three Laguna Court, Town",
+"python": "one twenty three Laguna Court, Town"
+},
+{
+"kind": "address",
+"written": "1211 E Arques Ave",
+"expected": "twelve eleven East Arques Avenue",
+"python": "twelve eleven East Arques Avenue"
+},
+{
+"kind": "address",
+"written": "708 N 1st St, San City",
+"expected": "seven zero eight North first Street, San City",
+"python": "seven zero eight North first Street, San City"
+},
+{
+"kind": "address",
+"written": "12 S 1st st",
+"expected": "twelve South first Street",
+"python": "twelve South first Street"
+},
+{
+"kind": "address",
+"written": "1990 for the Ata ST",
+"expected": "nineteen ninety for the Ata ST",
+"python": "nineteen ninety for the Ata ST"
+},
+{
+"kind": "address",
+"written": "Main St.",
+"expected": "Main St.",
+"python": "Main St."
+},
+{
+"kind": "address",
+"written": "Nancy lived at 1428 Elm St. It was a strange place.",
+"expected": "Nancy lived at fourteen twenty eight Elm Street. It was a strange place.",
+"python": "Nancy lived at fourteen twenty eight Elm Street. It was a strange place."
+},
+{
+"kind": "address",
+"written": "(incorrect normalization) Nancy lived at 1428 Elm St. 4 doors down lived her best friend.",
+"expected": "(incorrect normalization) Nancy lived at fourteen twenty eight Elm Street four doors down lived her best friend.",
+"python": "(incorrect normalization) Nancy lived at fourteen twenty eight Elm Street four doors down lived her best friend."
+},
+{
+"kind": "cardinal",
+"written": "1",
+"expected": "one",
+"python": "one"
+},
+{
+"kind": "cardinal",
+"written": "2",
+"expected": "two",
+"python": "two"
+},
+{
+"kind": "cardinal",
+"written": "-2",
+"expected": "minus two",
+"python": "minus two"
+},
+{
+"kind": "cardinal",
+"written": "3",
+"expected": "three",
+"python": "three"
+},
+{
+"kind": "cardinal",
+"written": "123",
+"expected": "one hundred and twenty three",
+"python": "one hundred and twenty three"
+},
+{
+"kind": "cardinal",
+"written": "13,000",
+"expected": "thirteen thousand",
+"python": "thirteen thousand"
+},
+{
+"kind": "cardinal",
+"written": "13000",
+"expected": "one three zero zero zero",
+"python": "one three zero zero zero"
+},
+{
+"kind": "cardinal",
+"written": "9000",
+"expected": "nine thousand",
+"python": "nine thousand"
+},
+{
+"kind": "cardinal",
+"written": "9,000",
+"expected": "nine thousand",
+"python": "nine thousand"
+},
+{
+"kind": "cardinal",
+"written": "123,000",
+"expected": "one hundred twenty three thousand",
+"python": "one hundred twenty three thousand"
+},
+{
+"kind": "cardinal",
+"written": "123000",
+"expected": "one two three zero zero zero",
+"python": "one two three zero zero zero"
+},
+{
+"kind": "cardinal",
+"written": "123,123,000",
+"expected": "one hundred twenty three million one hundred twenty three thousand",
+"python": "one hundred twenty three million one hundred twenty three thousand"
+},
+{
+"kind": "cardinal",
+"written": "123,000,012",
+"expected": "one hundred twenty three million twelve",
+"python": "one hundred twenty three million twelve"
+},
+{
+"kind": "cardinal",
+"written": "1,000,000",
+"expected": "one million",
+"python": "one million"
+},
+{
+"kind": "cardinal",
+"written": "1234567890123124",
+"expected": "one two three four five six seven eight nine zero one two three one two four",
+"python": "one two three four five six seven eight nine zero one two three one two four"
+},
+{
+"kind": "cardinal",
+"written": "978-0",
+"expected": "nine hundred and seventy eight - zero",
+"python": "nine hundred and seventy eight - zero"
+},
+{
+"kind": "cardinal",
+"written": "004",
+"expected": "zero zero four",
+"python": "zero zero four"
+},
+{
+"kind": "cardinal",
+"written": "124,444,234,854,823,834,553",
+"expected": "one hundred twenty four quintillion four hundred forty four quadrillion two hundred thirty four trillion eight hundred fifty four billion eight hundred twenty three million eight hundred thirty four thousand five hundred and fifty three",
+"python": "one hundred twenty four quintillion four hundred forty four quadrillion two hundred thirty four trillion eight hundred fifty four billion eight hundred twenty three million eight hundred thirty four thousand five hundred and fifty three"
+},
+{
+"kind": "date",
+"written": "july 25 2012",
+"expected": "july twenty fifth twenty twelve",
+"python": "july twenty fifth twenty twelve"
+},
+{
+"kind": "date",
+"written": "jul 25 2012",
+"expected": "july twenty fifth twenty twelve",
+"python": "july twenty fifth twenty twelve"
+},
+{
+"kind": "date",
+"written": "1980s",
+"expected": "nineteen eighties",
+"python": "nineteen eighties"
+},
+{
+"kind": "date",
+"written": "1980 s",
+"expected": "nineteen eighties",
+"python": "nineteen eighties"
+},
+{
+"kind": "date",
+"written": "25 july 2012",
+"expected": "the twenty fifth of july twenty twelve",
+"python": "the twenty fifth of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "25 jul 2012",
+"expected": "the twenty fifth of july twenty twelve",
+"python": "the twenty fifth of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "22 july 2012",
+"expected": "the twenty second of july twenty twelve",
+"python": "the twenty second of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "25th july 2012",
+"expected": "the twenty fifth of july twenty twelve",
+"python": "the twenty fifth of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "25th jul 2012",
+"expected": "the twenty fifth of july twenty twelve",
+"python": "the twenty fifth of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "22nd july 2012",
+"expected": "the twenty second of july twenty twelve",
+"python": "the twenty second of july twenty twelve"
+},
+{
+"kind": "date",
+"written": "15 january",
+"expected": "the fifteenth of january",
+"python": "the fifteenth of january"
+},
+{
+"kind": "date",
+"written": "17 may 2010",
+"expected": "the seventeenth of may twenty ten",
+"python": "the seventeenth of may twenty ten"
+},
+{
+"kind": "date",
+"written": "january 1",
+"expected": "january first",
+"python": "january first"
+},
+{
+"kind": "date",
+"written": "june 30",
+"expected": "june thirtieth",
+"python": "june thirtieth"
+},
+{
+"kind": "date",
+"written": "2012",
+"expected": "twenty twelve",
+"python": "twenty twelve"
+},
+{
+"kind": "date",
+"written": "july 1506",
+"expected": "july fifteen oh six",
+"python": "july fifteen oh six"
+},
+{
+"kind": "date",
+"written": "july 1876",
+"expected": "july eighteen seventy six",
+"python": "july eighteen seventy six"
+},
+{
+"kind": "date",
+"written": "1994",
+"expected": "nineteen ninety four",
+"python": "nineteen ninety four"
+},
+{
+"kind": "date",
+"written": "1976",
+"expected": "nineteen seventy six",
+"python": "nineteen seventy six"
+},
+{
+"kind": "date",
+"written": "june 20 2014",
+"expected": "june twentieth twenty fourteen",
+"python": "june twentieth twenty fourteen"
+},
+{
+"kind": "date",
+"written": "1973",
+"expected": "nineteen seventy three",
+"python": "nineteen seventy three"
+},
+{
+"kind": "date",
+"written": "1975",
+"expected": "nineteen seventy five",
+"python": "nineteen seventy five"
+},
+{
+"kind": "date",
+"written": "1155",
+"expected": "eleven fifty five",
+"python": "eleven fifty five"
+},
+{
+"kind": "date",
+"written": "2006-08-05",
+"expected": "august fifth two thousand six",
+"python": "august fifth two thousand six"
+},
+{
+"kind": "date",
+"written": "august 23 2002",
+"expected": "august twenty third two thousand two",
+"python": "august twenty third two thousand two"
+},
+{
+"kind": "date",
+"written": "16 July 1943",
+"expected": "the sixteenth of july nineteen forty three",
+"python": "the sixteenth of july nineteen forty three"
+},
+{
+"kind": "date",
+"written": "20 january",
+"expected": "the twentieth of january",
+"python": "the twentieth of january"
+},
+{
+"kind": "date",
+"written": "2016-11-03",
+"expected": "november third twenty sixteen",
+"python": "november third twenty sixteen"
+},
+{
+"kind": "date",
+"written": "2016/07/03",
+"expected": "july third twenty sixteen",
+"python": "july third twenty sixteen"
+},
+{
+"kind": "date",
+"written": "1980s",
+"expected": "nineteen eighties",
+"python": "nineteen eighties"
+},
+{
+"kind": "date",
+"written": "01.10.2010",
+"expected": "january tenth twenty ten",
+"python": "january tenth twenty ten"
+},
+{
+"kind": "date",
+"written": "10/06/2005",
+"expected": "october sixth two thousand five",
+"python": "october sixth two thousand five"
+},
+{
+"kind": "date",
+"written": "1910s",
+"expected": "nineteen tens",
+"python": "nineteen tens"
+},
+{
+"kind": "date",
+"written": "2000s",
+"expected": "two thousands",
+"python": "two thousands"
+},
+{
+"kind": "date",
+"written": "25 sept.",
+"expected": "the twenty fifth of september",
+"python": "the twenty fifth of september"
+},
+{
+"kind": "date",
+"written": "1000",
+"expected": "one thousand",
+"python": "one thousand"
+},
+{
+"kind": "date",
+"written": "SEPT. 15",
+"expected": "september fifteenth",
+"python": "september fifteenth"
+},
+{
+"kind": "date",
+"written": "JAN. 15 2020",
+"expected": "january fifteenth twenty twenty",
+"python": "january fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "Jan. 15 2020",
+"expected": "january fifteenth twenty twenty",
+"python": "january fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "Jan 15 2020",
+"expected": "january fifteenth twenty twenty",
+"python": "january fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "jan. 15",
+"expected": "january fifteenth",
+"python": "january fifteenth"
+},
+{
+"kind": "date",
+"written": "JAN 15 2020",
+"expected": "january fifteenth twenty twenty",
+"python": "january fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "SEPTEMBER 15 twenty twenty",
+"expected": "september fifteenth twenty twenty",
+"python": "september fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "11/17/05",
+"expected": "november seventeenth zero five",
+"python": "november seventeenth zero five"
+},
+{
+"kind": "date",
+"written": "01/07/98",
+"expected": "january seventh ninety eight",
+"python": "january seventh ninety eight"
+},
+{
+"kind": "date",
+"written": "One should go to the store on the 26th May in the evening",
+"expected": "One should go to the store on the twenty sixth of may in the evening",
+"python": "One should go to the store on the twenty sixth of may in the evening"
+},
+{
+"kind": "date",
+"written": "'80s",
+"expected": "eighties",
+"python": "eighties"
+},
+{
+"kind": "date",
+"written": "Jan-15-2020",
+"expected": "january fifteenth twenty twenty",
+"python": "january fifteenth twenty twenty"
+},
+{
+"kind": "date",
+"written": "Jan-15",
+"expected": "january fifteenth",
+"python": "january fifteenth"
+},
+{
+"kind": "date",
+"written": "15-01-2020",
+"expected": "the fifteenth of january twenty twenty",
+"python": "the fifteenth of january twenty twenty"
+},
+{
+"kind": "date",
+"written": "15.01.2020",
+"expected": "the fifteenth of january twenty twenty",
+"python": "the fifteenth of january twenty twenty"
+},
+{
+"kind": "date",
+"written": "340 A.D",
+"expected": "three forty AD",
+"python": "three forty AD"
+},
+{
+"kind": "date",
+"written": "1998/2/30",
+"expected": "february thirtieth nineteen ninety eight",
+"python": "february thirtieth nineteen ninety eight"
+},
+{
+"kind": "date",
+"written": "We have seen YoY growth in 2Q22",
+"expected": "We have seen YoY growth in the second quarter of twenty two",
+"python": "We have seen YoY growth in the second quarter of twenty two"
+},
+{
+"kind": "decimal",
+"written": ".1665",
+"expected": "point one six six five",
+"python": "point one six six five"
+},
+{
+"kind": "decimal",
+"written": "2.0",
+"expected": "two point zero",
+"python": "two point zero"
+},
+{
+"kind": "decimal",
+"written": "2.00",
+"expected": "two point zero zero",
+"python": "two point zero zero"
+},
+{
+"kind": "decimal",
+"written": "2.050",
+"expected": "two point zero five zero",
+"python": "two point zero five zero"
+},
+{
+"kind": "decimal",
+"written": "100 million",
+"expected": "one hundred million",
+"python": "one hundred million"
+},
+{
+"kind": "decimal",
+"written": "0.1 billion",
+"expected": "zero point one billion",
+"python": "zero point one billion"
+},
+{
+"kind": "decimal",
+"written": ".1 trillion",
+"expected": "point one trillion",
+"python": "point one trillion"
+},
+{
+"kind": "decimal",
+"written": "-0.1",
+"expected": "minus zero point one",
+"python": "minus zero point one"
+},
+{
+"kind": "decimal",
+"written": "0.004",
+"expected": "zero point zero zero four",
+"python": "zero point zero zero four"
+},
+{
+"kind": "decimal",
+"written": "0.1 M",
+"expected": "zero point one M",
+"python": "zero point one M"
+},
+{
+"kind": "decimal",
+"written": "0.1 B",
+"expected": "zero point one B",
+"python": "zero point one B"
+},
+{
+"kind": "decimal",
+"written": "0.1 K",
+"expected": "zero point one K",
+"python": "zero point one K"
+},
+{
+"kind": "electronic",
+"written": "a.bc@gmail.com",
+"expected": "a dot bc at gmail dot com",
+"python": "a dot bc at gmail dot com"
+},
+{
+"kind": "electronic",
+"written": "a@hotmail.de",
+"expected": "a at hotmail dot DE",
+"python": "a at hotmail dot DE"
+},
+{
+"kind": "electronic",
+"written": "a@hotmail.fr",
+"expected": "a at hotmail dot FR",
+"python": "a at hotmail dot FR"
+},
+{
+"kind": "electronic",
+"written": "a@hotmail.it",
+"expected": "a at hotmail dot IT",
+"python": "a at hotmail dot IT"
+},
+{
+"kind": "electronic",
+"written": "a@aol.it",
+"expected": "a at aol dot IT",
+"python": "a at aol dot IT"
+},
+{
+"kind": "electronic",
+"written": "a@msn.it",
+"expected": "a at msn dot IT",
+"python": "a at msn dot IT"
+},
+{
+"kind": "electronic",
+"written": "cdf@abc.edu",
+"expected": "cdf at abc dot edu",
+"python": "cdf at abc dot edu"
+},
+{
+"kind": "electronic",
+"written": "abc@gmail.abc",
+"expected": "abc at gmail dot ABC",
+"python": "abc at gmail dot ABC"
+},
+{
+"kind": "electronic",
+"written": "abc@abc.com",
+"expected": "abc at abc dot com",
+"python": "abc at abc dot com"
+},
+{
+"kind": "electronic",
+"written": "asdf123@abc.com",
+"expected": "asdf one two three at abc dot com",
+"python": "asdf one two three at abc dot com"
+},
+{
+"kind": "electronic",
+"written": "a1b2@abc.com",
+"expected": "a one b two at abc dot com",
+"python": "a one b two at abc dot com"
+},
+{
+"kind": "electronic",
+"written": "ab3.sdd.3@gmail.com",
+"expected": "ab three dot sdd dot three at gmail dot com",
+"python": "ab three dot sdd dot three at gmail dot com"
+},
+{
+"kind": "electronic",
+"written": "email is abc1@gmail.com",
+"expected": "email is abc one at gmail dot com",
+"python": "email is abc one at gmail dot com"
+},
+{
+"kind": "electronic",
+"written": "abs@nvidia.com",
+"expected": "abs at NVIDIA dot com",
+"python": "abs at NVIDIA dot com"
+},
+{
+"kind": "electronic",
+"written": "email is a-1.b3_c&-d@gma4i-l.com test",
+"expected": "email is a dash one dot b three underscore c ampersand dash d at gma four i dash l dot com test",
+"python": "email is a dash one dot b three underscore c ampersand dash d at gma four i dash l dot com test"
+},
+{
+"kind": "electronic",
+"written": "nvidia.com",
+"expected": "nvidia dot com",
+"python": "nvidia dot com"
+},
+{
+"kind": "electronic",
+"written": "test.com",
+"expected": "test dot com",
+"python": "test dot com"
+},
+{
+"kind": "electronic",
+"written": "test.abc",
+"expected": "test dot abc",
+"python": "test dot abc"
+},
+{
+"kind": "electronic",
+"written": "http://www.ourdailynews.com.sm",
+"expected": "HTTP colon slash slash WWW dot ourdailynews dot com dot SM",
+"python": "HTTP colon slash slash WWW dot ourdailynews dot com dot SM"
+},
+{
+"kind": "electronic",
+"written": "https://www.ourdailynews.com.sm",
+"expected": "HTTPS colon slash slash WWW dot ourdailynews dot com dot SM",
+"python": "HTTPS colon slash slash WWW dot ourdailynews dot com dot SM"
+},
+{
+"kind": "electronic",
+"written": "www.ourdailynews.com.sm",
+"expected": "WWW dot ourdailynews dot com dot SM",
+"python": "WWW dot ourdailynews dot com dot SM"
+},
+{
+"kind": "electronic",
+"written": "www.ourdailynews.com/123-sm",
+"expected": "WWW dot ourdailynews dot com slash one two three dash SM",
+"python": "WWW dot ourdailynews dot com slash one two three dash SM"
+},
+{
+"kind": "electronic",
+"written": "sdf@gmail.com.sm",
+"expected": "sdf at gmail dot com dot SM",
+"python": "sdf at gmail dot com dot SM"
+},
+{
+"kind": "electronic",
+"written": "sdf@gmail.com/123-sm",
+"expected": "sdf at gmail dot com slash one two three dash SM",
+"python": "sdf at gmail dot com slash one two three dash SM"
+},
+{
+"kind": "electronic",
+"written": "sdf@gmail.abc/123-sm",
+"expected": "sdf at gmail dot ABC slash one two three dash SM",
+"python": "sdf at gmail dot ABC slash one two three dash SM"
+},
+{
+"kind": "electronic",
+"written": "sdf@gmail.abc/123456-sm",
+"expected": "sdf at gmail dot ABC slash one two three four five six dash SM",
+"python": "sdf at gmail dot ABC slash one two three four five six dash SM"
+},
+{
+"kind": "electronic",
+"written": "ourdailynews.com/12-sm",
+"expected": "ourdailynews dot com slash one two dash sm",
+"python": "ourdailynews dot com slash one two dash sm"
+},
+{
+"kind": "electronic",
+"written": "ourdailynews.abc",
+"expected": "ourdailynews dot abc",
+"python": "ourdailynews dot abc"
+},
+{
+"kind": "electronic",
+"written": "file:///c/code/NeMo/docs/build/html/processing/intro.html",
+"expected": "file colon slash slash slash c slash code slash nemo slash docs slash build slash html slash processing slash intro dot HTML",
+"python": "file colon slash slash slash c slash code slash nemo slash docs slash build slash html slash processing slash intro dot HTML"
+},
+{
+"kind": "electronic",
+"written": "file:///photos/image.jpg",
+"expected": "file colon slash slash slash photos slash image dot jpeg",
+"python": "file colon slash slash slash photos slash image dot jpeg"
+},
+{
+"kind": "electronic",
+"written": "electronic test.com and test2.uk",
+"expected": "electronic test dot com and test two dot UK",
+"python": "electronic test dot com and test two dot UK"
+},
+{
+"kind": "electronic",
+"written": "https://developer.nvidia.com/drive-sim-early-access-program",
+"expected": "HTTPS colon slash slash developer dot NVIDIA dot com slash drive dash sim dash early dash access dash program",
+"python": "HTTPS colon slash slash developer dot NVIDIA dot com slash drive dash sim dash early dash access dash program"
+},
+{
+"kind": "electronic",
+"written": "https://developer.nvidia.com/cv-cuda/early-access",
+"expected": "HTTPS colon slash slash developer dot NVIDIA dot com slash cv dash CUDA slash early dash access",
+"python": "HTTPS colon slash slash developer dot NVIDIA dot com slash cv dash CUDA slash early dash access"
+},
+{
+"kind": "electronic",
+"written": "https://www.nvidia.com/dgx-basepod",
+"expected": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD",
+"python": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD"
+},
+{
+"kind": "electronic",
+"written": "https://www.nvidia.com/dgx-basepod.sm/3",
+"expected": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD dot SM slash three",
+"python": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD dot SM slash three"
+},
+{
+"kind": "electronic",
+"written": "http://www.nvidia.com/rtx-6000",
+"expected": "HTTP colon slash slash WWW dot NVIDIA dot com slash RTX dash six thousand",
+"python": "HTTP colon slash slash WWW dot NVIDIA dot com slash RTX dash six thousand"
+},
+{
+"kind": "electronic",
+"written": "rtxprohelp@exchange.nvidia.com",
+"expected": "RTX pro help at exchange dot NVIDIA dot com",
+"python": "RTX pro help at exchange dot NVIDIA dot com"
+},
+{
+"kind": "electronic",
+"written": "enterpriseservices@nvidia.com",
+"expected": "enterprise services at NVIDIA dot com",
+"python": "enterprise services at NVIDIA dot com"
+},
+{
+"kind": "electronic",
+"written": "enterprise-services@nvidia.com",
+"expected": "enterprise dash services at NVIDIA dot com",
+"python": "enterprise dash services at NVIDIA dot com"
+},
+{
+"kind": "electronic",
+"written": "https://www.nvidia.com/dgx-basepod/",
+"expected": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD slash",
+"python": "HTTPS colon slash slash WWW dot NVIDIA dot com slash DGX dash BASEPOD slash"
+},
+{
+"kind": "electronic",
+"written": "i can use your card ending in 8876",
+"expected": "i can use your card ending in eight eight seven six",
+"python": "i can use your card ending in eight eight seven six"
+},
+{
+"kind": "electronic",
+"written": "upgrade/update",
+"expected": "upgrade slash update",
+"python": "upgrade slash update"
+},
+{
+"kind": "electronic",
+"written": "upgrade / update",
+"expected": "upgrade slash update",
+"python": "upgrade slash update"
+},
+{
+"kind": "electronic",
+"written": "upgrade/update/downgrade",
+"expected": "upgrade slash update slash downgrade",
+"python": "upgrade slash update slash downgrade"
+},
+{
+"kind": "electronic",
+"written": "5.4, or 5.5",
+"expected": "five point four, or five point five",
+"python": "five point four, or five point five"
+},
+{
+"kind": "fraction",
+"written": "1/2007",
+"expected": "one two thousand seventh",
+"python": "one two thousand seventh"
+},
+{
+"kind": "fraction",
+"written": "12639/12640",
+"expected": "twelve thousand six hundred thirty nine twelve thousand six hundred fortieths",
+"python": "twelve thousand six hundred thirty nine twelve thousand six hundred fortieths"
+},
+{
+"kind": "fraction",
+"written": "3 2/4",
+"expected": "three and two quarters",
+"python": "three and two quarters"
+},
+{
+"kind": "fraction",
+"written": "1/4",
+"expected": "one quarter",
+"python": "one quarter"
+},
+{
+"kind": "fraction",
+"written": "1/4th",
+"expected": "one quarter",
+"python": "one quarter"
+},
+{
+"kind": "fraction",
+"written": "2/4th",
+"expected": "two quarters",
+"python": "two quarters"
+},
+{
+"kind": "fraction",
+"written": "1/4TH",
+"expected": "one quarter",
+"python": "one quarter"
+},
+{
+"kind": "fraction",
+"written": "1/3RD",
+"expected": "one third",
+"python": "one third"
+},
+{
+"kind": "fraction",
+"written": "31/32",
+"expected": "thirty one thirty seconds",
+"python": "thirty one thirty seconds"
+},
+{
+"kind": "fraction",
+"written": "22/3",
+"expected": "twenty two thirds",
+"python": "twenty two thirds"
+},
+{
+"kind": "fraction",
+"written": "1/3",
+"expected": "one third",
+"python": "one third"
+},
+{
+"kind": "fraction",
+"written": "2 142/1",
+"expected": "two and one hundred forty two over one",
+"python": "two and one hundred forty two over one"
+},
+{
+"kind": "fraction",
+"written": "1/2",
+"expected": "one half",
+"python": "one half"
+},
+{
+"kind": "fraction",
+"written": "2 1/2",
+"expected": "two and a half",
+"python": "two and a half"
+},
+{
+"kind": "fraction",
+"written": "3 5/2",
+"expected": "three and five halves",
+"python": "three and five halves"
+},
+{
+"kind": "fraction",
+"written": "1795 / 1805",
+"expected": "one thousand seven hundred ninety five one thousand eight hundred fifths",
+"python": "one thousand seven hundred ninety five one thousand eight hundred fifths"
+},
+{
+"kind": "math",
+"written": "1-2=5",
+"expected": "one minus two equals five",
+"python": "one minus two equals five"
+},
+{
+"kind": "math",
+"written": "1- 2 = 5",
+"expected": "one minus two equals five",
+"python": "one minus two equals five"
+},
+{
+"kind": "math",
+"written": "y=x +1",
+"expected": "y equals x plus one",
+"python": "y equals x plus one"
+},
+{
+"kind": "math",
+"written": "x +1 = y",
+"expected": "x plus one equals y",
+"python": "x plus one equals y"
+},
+{
+"kind": "measure",
+"written": "12kg",
+"expected": "twelve kilograms",
+"python": "twelve kilograms"
+},
+{
+"kind": "measure",
+"written": "12KG",
+"expected": "twelve kilograms",
+"python": "twelve kilograms"
+},
+{
+"kind": "measure",
+"written": "12/kg",
+"expected": "twelve per kilogram",
+"python": "twelve per kilogram"
+},
+{
+"kind": "measure",
+"written": "12kg/kg",
+"expected": "twelve kilograms per kilogram",
+"python": "twelve kilograms per kilogram"
+},
+{
+"kind": "measure",
+"written": "1 mbps",
+"expected": "one megabit per second",
+"python": "one megabit per second"
+},
+{
+"kind": "measure",
+"written": "3 mbps",
+"expected": "three megabits per second",
+"python": "three megabits per second"
+},
+{
+"kind": "measure",
+"written": "3 cc/s",
+"expected": "three CC per S",
+"python": "three CC per S"
+},
+{
+"kind": "measure",
+"written": "100 million kg",
+"expected": "one hundred million kilograms",
+"python": "one hundred million kilograms"
+},
+{
+"kind": "measure",
+"written": "a 123.2-millimeters long",
+"expected": "a one hundred and twenty three point two millimeters long",
+"python": "a one hundred and twenty three point two millimeters long"
+},
+{
+"kind": "measure",
+"written": "covid-19.5",
+"expected": "covid- nineteen point five",
+"python": "covid- nineteen point five"
+},
+{
+"kind": "measure",
+"written": "7.2-millimeter bullet",
+"expected": "seven point two millimeter bullet",
+"python": "seven point two millimeter bullet"
+},
+{
+"kind": "measure",
+"written": "4 1/2 lbs",
+"expected": "four and a half pounds",
+"python": "four and a half pounds"
+},
+{
+"kind": "measure",
+"written": "4.4x",
+"expected": "four point four x",
+"python": "four point four x"
+},
+{
+"kind": "measure",
+"written": "80 s",
+"expected": "eighty S",
+"python": "eighty S"
+},
+{
+"kind": "measure",
+"written": "2°C",
+"expected": "two degrees Celsius",
+"python": "two degrees Celsius"
+},
+{
+"kind": "measure",
+"written": "1°C",
+"expected": "one degree Celsius",
+"python": "one degree Celsius"
+},
+{
+"kind": "measure",
+"written": "1234-123kg",
+"expected": "one thousand two hundred and thirty four to one hundred and twenty three kilograms",
+"python": "one thousand two hundred and thirty four to one hundred and twenty three kilograms"
+},
+{
+"kind": "measure",
+"written": "45º&C",
+"expected": "forty five degree and C",
+"python": "forty five degree and C"
+},
+{
+"kind": "measure",
+"written": "41,459.00 km³",
+"expected": "forty one thousand four hundred and fifty nine point zero zero cubic kilometers",
+"python": "forty one thousand four hundred and fifty nine point zero zero cubic kilometers"
+},
+{
+"kind": "measure",
+"written": "Nancy lived on 1428 Elm St.",
+"expected": "Nancy lived on fourteen twenty eight Elm Street",
+"python": "Nancy lived on fourteen twenty eight Elm Street"
+},
+{
+"kind": "measure",
+"written": "Nancy lived on 1428 Elm St. It was a strange place.",
+"expected": "Nancy lived on fourteen twenty eight Elm Street. It was a strange place.",
+"python": "Nancy lived on fourteen twenty eight Elm Street. It was a strange place."
+},
+{
+"kind": "money",
+"written": "$2",
+"expected": "two dollars",
+"python": "two dollars"
+},
+{
+"kind": "money",
+"written": "$2.00",
+"expected": "two dollars",
+"python": "two dollars"
+},
+{
+"kind": "money",
+"written": "₩460 billion",
+"expected": "four hundred sixty billion won",
+"python": "four hundred sixty billion won"
+},
+{
+"kind": "money",
+"written": "¥30 billion",
+"expected": "thirty billion yen",
+"python": "thirty billion yen"
+},
+{
+"kind": "money",
+"written": "¥30 b",
+"expected": "thirty billion yen",
+"python": "thirty billion yen"
+},
+{
+"kind": "money",
+"written": "¥30b",
+"expected": "thirty billion yen",
+"python": "thirty billion yen"
+},
+{
+"kind": "money",
+"written": "¥30B",
+"expected": "thirty billion yen",
+"python": "thirty billion yen"
+},
+{
+"kind": "money",
+"written": "$45 billion",
+"expected": "forty five billion dollars",
+"python": "forty five billion dollars"
+},
+{
+"kind": "money",
+"written": "$0.2 million",
+"expected": "zero point two million dollars",
+"python": "zero point two million dollars"
+},
+{
+"kind": "money",
+"written": "$2.5 million",
+"expected": "two point five million dollars",
+"python": "two point five million dollars"
+},
+{
+"kind": "money",
+"written": "$15.2 billion",
+"expected": "fifteen point two billion dollars",
+"python": "fifteen point two billion dollars"
+},
+{
+"kind": "money",
+"written": "1.436 billion yuan",
+"expected": "one point four three six billion yuan",
+"python": "one point four three six billion yuan"
+},
+{
+"kind": "money",
+"written": "4 million yuan",
+"expected": "four million yuan",
+"python": "four million yuan"
+},
+{
+"kind": "money",
+"written": "$15000",
+"expected": "fifteen thousand dollars",
+"python": "fifteen thousand dollars"
+},
+{
+"kind": "money",
+"written": "$1",
+"expected": "one dollar",
+"python": "one dollar"
+},
+{
+"kind": "money",
+"written": "$1.00",
+"expected": "one dollar",
+"python": "one dollar"
+},
+{
+"kind": "money",
+"written": "$1.00",
+"expected": "one dollar",
+"python": "one dollar"
+},
+{
+"kind": "money",
+"written": "$2",
+"expected": "two dollars",
+"python": "two dollars"
+},
+{
+"kind": "money",
+"written": "$2.00",
+"expected": "two dollars",
+"python": "two dollars"
+},
+{
+"kind": "money",
+"written": "$2.000",
+"expected": "two dollars",
+"python": "two dollars"
+},
+{
+"kind": "money",
+"written": "$20",
+"expected": "twenty dollars",
+"python": "twenty dollars"
+},
+{
+"kind": "money",
+"written": "$20.506",
+"expected": "twenty point five zero six dollars",
+"python": "twenty point five zero six dollars"
+},
+{
+"kind": "money",
+"written": "$20.50",
+"expected": "twenty dollars fifty cents",
+"python": "twenty dollars fifty cents"
+},
+{
+"kind": "money",
+"written": "$20.500",
+"expected": "twenty dollars fifty cents",
+"python": "twenty dollars fifty cents"
+},
+{
+"kind": "money",
+"written": "$20.5",
+"expected": "twenty dollars fifty cents",
+"python": "twenty dollars fifty cents"
+},
+{
+"kind": "money",
+"written": "$20.01",
+"expected": "twenty dollars one cent",
+"python": "twenty dollars one cent"
+},
+{
+"kind": "money",
+"written": "$20.010",
+"expected": "twenty dollars one cent",
+"python": "twenty dollars one cent"
+},
+{
+"kind": "money",
+"written": "$0.010",
+"expected": "one cent",
+"python": "one cent"
+},
+{
+"kind": "money",
+"written": "$0.02",
+"expected": "two cents",
+"python": "two cents"
+},
+{
+"kind": "money",
+"written": "$0.20",
+"expected": "twenty cents",
+"python": "twenty cents"
+},
+{
+"kind": "money",
+"written": "$.01",
+"expected": "one cent",
+"python": "one cent"
+},
+{
+"kind": "money",
+"written": "$.506",
+"expected": "point five zero six dollars",
+"python": "point five zero six dollars"
+},
+{
+"kind": "money",
+"written": "$18",
+"expected": "eighteen dollars",
+"python": "eighteen dollars"
+},
+{
+"kind": "money",
+"written": "$18925000",
+"expected": "eighteen million nine hundred twenty five thousand dollars",
+"python": "eighteen million nine hundred twenty five thousand dollars"
+},
+{
+"kind": "money",
+"written": "$18,925,000",
+"expected": "eighteen million nine hundred twenty five thousand dollars",
+"python": "eighteen million nine hundred twenty five thousand dollars"
+},
+{
+"kind": "money",
+"written": "$18854",
+"expected": "eighteen thousand eight hundred and fifty four dollars",
+"python": "eighteen thousand eight hundred and fifty four dollars"
+},
+{
+"kind": "money",
+"written": "$18801",
+"expected": "eighteen thousand eight hundred and one dollars",
+"python": "eighteen thousand eight hundred and one dollars"
+},
+{
+"kind": "money",
+"written": "$18875",
+"expected": "eighteen thousand eight hundred and seventy five dollars",
+"python": "eighteen thousand eight hundred and seventy five dollars"
+},
+{
+"kind": "money",
+"written": "$18081",
+"expected": "eighteen thousand and eighty one dollars",
+"python": "eighteen thousand and eighty one dollars"
+},
+{
+"kind": "money",
+"written": "$18052",
+"expected": "eighteen thousand and fifty two dollars",
+"python": "eighteen thousand and fifty two dollars"
+},
+{
+"kind": "money",
+"written": "$18542",
+"expected": "eighteen thousand five hundred and forty two dollars",
+"python": "eighteen thousand five hundred and forty two dollars"
+},
+{
+"kind": "money",
+"written": "$18519",
+"expected": "eighteen thousand five hundred and nineteen dollars",
+"python": "eighteen thousand five hundred and nineteen dollars"
+},
+{
+"kind": "money",
+"written": "$18570",
+"expected": "eighteen thousand five hundred and seventy dollars",
+"python": "eighteen thousand five hundred and seventy dollars"
+},
+{
+"kind": "money",
+"written": "$18578",
+"expected": "eighteen thousand five hundred and seventy eight dollars",
+"python": "eighteen thousand five hundred and seventy eight dollars"
+},
+{
+"kind": "money",
+"written": "$18516",
+"expected": "eighteen thousand five hundred and sixteen dollars",
+"python": "eighteen thousand five hundred and sixteen dollars"
+},
+{
+"kind": "money",
+"written": "$18482",
+"expected": "eighteen thousand four hundred and eighty two dollars",
+"python": "eighteen thousand four hundred and eighty two dollars"
+},
+{
+"kind": "money",
+"written": "$18478",
+"expected": "eighteen thousand four hundred and seventy eight dollars",
+"python": "eighteen thousand four hundred and seventy eight dollars"
+},
+{
+"kind": "money",
+"written": "$18468",
+"expected": "eighteen thousand four hundred and sixty eight dollars",
+"python": "eighteen thousand four hundred and sixty eight dollars"
+},
+{
+"kind": "money",
+"written": "$18903",
+"expected": "eighteen thousand nine hundred and three dollars",
+"python": "eighteen thousand nine hundred and three dollars"
+},
+{
+"kind": "money",
+"written": "$18929",
+"expected": "eighteen thousand nine hundred and twenty nine dollars",
+"python": "eighteen thousand nine hundred and twenty nine dollars"
+},
+{
+"kind": "money",
+"written": "$18095",
+"expected": "eighteen thousand and ninety five dollars",
+"python": "eighteen thousand and ninety five dollars"
+},
+{
+"kind": "money",
+"written": "$18117",
+"expected": "eighteen thousand one hundred and seventeen dollars",
+"python": "eighteen thousand one hundred and seventeen dollars"
+},
+{
+"kind": "money",
+"written": "$18128",
+"expected": "eighteen thousand one hundred and twenty eight dollars",
+"python": "eighteen thousand one hundred and twenty eight dollars"
+},
+{
+"kind": "money",
+"written": "$18125",
+"expected": "eighteen thousand one hundred and twenty five dollars",
+"python": "eighteen thousand one hundred and twenty five dollars"
+},
+{
+"kind": "money",
+"written": "$18124",
+"expected": "eighteen thousand one hundred and twenty four dollars",
+"python": "eighteen thousand one hundred and twenty four dollars"
+},
+{
+"kind": "money",
+"written": "$18129",
+"expected": "eighteen thousand one hundred and twenty nine dollars",
+"python": "eighteen thousand one hundred and twenty nine dollars"
+},
+{
+"kind": "money",
+"written": "£18000",
+"expected": "eighteen thousand pounds",
+"python": "eighteen thousand pounds"
+},
+{
+"kind": "money",
+"written": "£1.20",
+"expected": "one pound twenty pence",
+"python": "one pound twenty pence"
+},
+{
+"kind": "money",
+"written": "£1.111",
+"expected": "one point one one one pounds",
+"python": "one point one one one pounds"
+},
+{
+"kind": "money",
+"written": "£2.01",
+"expected": "two pounds one penny",
+"python": "two pounds one penny"
+},
+{
+"kind": "money",
+"written": "$50.00-$100.00",
+"expected": "fifty dollars to one hundred dollars",
+"python": "fifty dollars to one hundred dollars"
+},
+{
+"kind": "money",
+"written": "$1,925.21",
+"expected": "one thousand nine hundred and twenty five dollars twenty one cents",
+"python": "one thousand nine hundred and twenty five dollars twenty one cents"
+},
+{
+"kind": "money",
+"written": "$1,234.123",
+"expected": "one thousand two hundred and thirty four point one two three dollars",
+"python": "one thousand two hundred and thirty four point one two three dollars"
+},
+{
+"kind": "money",
+"written": "US $76.3 trillion",
+"expected": "US seventy six point three trillion dollars",
+"python": "US seventy six point three trillion dollars"
+},
+{
+"kind": "money",
+"written": "US$76.3 trillion",
+"expected": "seventy six point three trillion us dollars",
+"python": "seventy six point three trillion us dollars"
+},
+{
+"kind": "money",
+"written": "The price for each canned salmon is $5 , each bottle of peanut butter is $3",
+"expected": "The price for each canned salmon is five dollars , each bottle of peanut butter is three dollars",
+"python": "The price for each canned salmon is five dollars, each bottle of peanut butter is three dollars"
+},
+{
+"kind": "money",
+"written": "$20/mo is what we are currently charging.",
+"expected": "twenty dollars per month is what we are currently charging.",
+"python": "twenty dollars per month is what we are currently charging."
+},
+{
+"kind": "money",
+"written": "$350/yr is the fee.",
+"expected": "three hundred and fifty dollars per year is the fee.",
+"python": "three hundred and fifty dollars per year is the fee."
+},
+{
+"kind": "money",
+"written": "£10/wk sounds good to us.",
+"expected": "ten pounds per week sounds good to us.",
+"python": "ten pounds per week sounds good to us."
+},
+{
+"kind": "money",
+"written": "$1/d is the new subscription cost.",
+"expected": "one dollar per day is the new subscription cost.",
+"python": "one dollar per day is the new subscription cost."
+},
+{
+"kind": "money",
+"written": "$0.5/hr is the total cost.",
+"expected": "fifty cents per hour is the total cost.",
+"python": "fifty cents per hour is the total cost."
+},
+{
+"kind": "ordinal",
+"written": "0th",
+"expected": "zeroth",
+"python": "zeroth"
+},
+{
+"kind": "ordinal",
+"written": "11th",
+"expected": "eleventh",
+"python": "eleventh"
+},
+{
+"kind": "ordinal",
+"written": "23rd",
+"expected": "twenty third",
+"python": "twenty third"
+},
+{
+"kind": "ordinal",
+"written": "1000th",
+"expected": "one thousandth",
+"python": "one thousandth"
+},
+{
+"kind": "ordinal",
+"written": "1,000th",
+"expected": "one thousandth",
+"python": "one thousandth"
+},
+{
+"kind": "ordinal",
+"written": "1000000th",
+"expected": "one millionth",
+"python": "one millionth"
+},
+{
+"kind": "ordinal",
+"written": "9,000,000th",
+"expected": "nine millionth",
+"python": "nine millionth"
+},
+{
+"kind": "ordinal",
+"written": "1st",
+"expected": "first",
+"python": "first"
+},
+{
+"kind": "ordinal",
+"written": "1th",
+"expected": "one th",
+"python": "one th"
+},
+{
+"kind": "ordinal",
+"written": "2nd",
+"expected": "second",
+"python": "second"
+},
+{
+"kind": "ordinal",
+"written": "2th",
+"expected": "two th",
+"python": "two th"
+},
+{
+"kind": "ordinal",
+"written": "3rd",
+"expected": "third",
+"python": "third"
+},
+{
+"kind": "ordinal",
+"written": "3th",
+"expected": "three th",
+"python": "three th"
+},
+{
+"kind": "ordinal",
+"written": "4th",
+"expected": "fourth",
+"python": "fourth"
+},
+{
+"kind": "ordinal",
+"written": "4rd",
+"expected": "four rd",
+"python": "four rd"
+},
+{
+"kind": "ordinal",
+"written": "11th",
+"expected": "eleventh",
+"python": "eleventh"
+},
+{
+"kind": "ordinal",
+"written": "11st",
+"expected": "eleven st",
+"python": "eleven st"
+},
+{
+"kind": "ordinal",
+"written": "20th",
+"expected": "twentieth",
+"python": "twentieth"
+},
+{
+"kind": "ordinal",
+"written": "12th",
+"expected": "twelfth",
+"python": "twelfth"
+},
+{
+"kind": "ordinal",
+"written": "13th",
+"expected": "thirteenth",
+"python": "thirteenth"
+},
+{
+"kind": "ordinal",
+"written": "12nd",
+"expected": "twelve nd",
+"python": "twelve nd"
+},
+{
+"kind": "ordinal",
+"written": "13rd",
+"expected": "thirteen rd",
+"python": "thirteen rd"
+},
+{
+"kind": "ordinal",
+"written": "21st",
+"expected": "twenty first",
+"python": "twenty first"
+},
+{
+"kind": "ordinal",
+"written": "21th",
+"expected": "twenty one th",
+"python": "twenty one th"
+},
+{
+"kind": "ordinal",
+"written": "121st",
+"expected": "one hundred twenty first",
+"python": "one hundred twenty first"
+},
+{
+"kind": "ordinal",
+"written": "111th",
+"expected": "one hundred eleventh",
+"python": "one hundred eleventh"
+},
+{
+"kind": "ordinal",
+"written": "111st",
+"expected": "one hundred eleven st",
+"python": "one hundred eleven st"
+},
+{
+"kind": "punctuation",
+"written": "a `quote` example",
+"expected": "a `quote` example",
+"python": "a `quote` example"
+},
+{
+"kind": "punctuation",
+"written": "a `25` example",
+"expected": "a `twenty five` example",
+"python": "a `twenty five` example"
+},
+{
+"kind": "punctuation",
+"written": "single quote.'",
+"expected": "single quote.'",
+"python": "single quote.'"
+},
+{
+"kind": "punctuation",
+"written": "single quote. '4",
+"expected": "single quote. ' four",
+"python": "single quote. ' four"
+},
+{
+"kind": "punctuation",
+"written": "company's results,' said he:",
+"expected": "company's results,' said he:",
+"python": "company's results,' said he:"
+},
+{
+"kind": "punctuation",
+"written": "test -",
+"expected": "test -",
+"python": "test -"
+},
+{
+"kind": "punctuation",
+"written": "-5 test -",
+"expected": "minus five test -",
+"python": "minus five test -"
+},
+{
+"kind": "punctuation",
+"written": "abbreviation USA.",
+"expected": "abbreviation USA.",
+"python": "abbreviation USA."
+},
+{
+"kind": "punctuation",
+"written": "abbreviation U.S.A.",
+"expected": "abbreviation USA",
+"python": "abbreviation USA"
+},
+{
+"kind": "punctuation",
+"written": "abbreviation. U.S.A..",
+"expected": "abbreviation. USA..",
+"python": "abbreviation. USA.."
+},
+{
+"kind": "punctuation",
+"written": "1-4=5",
+"expected": "one minus four equals five",
+"python": "one minus four equals five"
+},
+{
+"kind": "punctuation",
+"written": "&hi;&hi;",
+"expected": "and hi; and hi;",
+"python": "and hi; and hi;"
+},
+{
+"kind": "punctuation",
+"written": "abbreviation USA,",
+"expected": "abbreviation USA,",
+"python": "abbreviation USA,"
+},
+{
+"kind": "punctuation",
+"written": "23rd july, 1998",
+"expected": "the twenty third of july, nineteen ninety eight",
+"python": "the twenty third of july, nineteen ninety eight"
+},
+{
+"kind": "punctuation",
+"written": "April 29th’s meeting",
+"expected": "april twenty ninth’s meeting",
+"python": "april twenty ninth’s meeting"
+},
+{
+"kind": "punctuation",
+"written": "?,",
+"expected": "?,",
+"python": "?,"
+},
+{
+"kind": "punctuation",
+"written": "?,no",
+"expected": "?,no",
+"python": "?,no"
+},
+{
+"kind": "punctuation",
+"written": "I've 20' and 14/ they're I'm 16c.",
+"expected": "I've twenty ' and fourteen slash they're I'm sixteen c.",
+"python": "I've twenty ' and fourteen slash they're I'm sixteen c."
+},
+{
+"kind": "punctuation",
+"written": "He's and I'm and Müller's and d'être",
+"expected": "He's and I'm and Müller's and d'être",
+"python": "He's and I'm and Müller's and d'être"
+},
+{
+"kind": "punctuation",
+"written": "here (4 June 2014). and",
+"expected": "here (the fourth of june twenty fourteen). and",
+"python": "here (the fourth of june twenty fourteen). and"
+},
+{
+"kind": "punctuation",
+"written": "``He's 50 and 2010``.",
+"expected": "\"He's fifty and twenty ten\".",
+"python": "\"He's fifty and twenty ten\"."
+},
+{
+"kind": "punctuation",
+"written": "\"He's 50 and 2010\".",
+"expected": "\"He's fifty and twenty ten\".",
+"python": "\"He's fifty and twenty ten\"."
+},
+{
+"kind": "punctuation",
+"written": "``test``.",
+"expected": "\"test\".",
+"python": "\"test\"."
+},
+{
+"kind": "punctuation",
+"written": "This (12 species) and...",
+"expected": "This (twelve species) and...",
+"python": "This (twelve species) and..."
+},
+{
+"kind": "punctuation",
+"written": "animals: ``cat``, ``dog``, ``lion``",
+"expected": "animals: \"cat\", \"dog\", \"lion\"",
+"python": "animals: \"cat\", \"dog\", \"lion\""
+},
+{
+"kind": "punctuation",
+"written": "animals: (1), (2), (3)",
+"expected": "animals: (one), (two), (three)",
+"python": "animals: (one), (two), (three)"
+},
+{
+"kind": "punctuation",
+"written": "animals: ``cat",
+"expected": "animals: \"cat",
+"python": "animals: \"cat"
+},
+{
+"kind": "punctuation",
+"written": "animals: ``4",
+"expected": "animals: \" four",
+"python": "animals: \" four"
+},
+{
+"kind": "punctuation",
+"written": "non matching quotes?\" \"12text\"",
+"expected": "non matching quotes?\" \"twelve text\"",
+"python": "non matching quotes?\" \"twelve text\""
+},
+{
+"kind": "punctuation",
+"written": "12\"",
+"expected": "twelve inches",
+"python": "twelve inches"
+},
+{
+"kind": "punctuation",
+"written": "\"12's and 3'sssssss\"",
+"expected": "\"twelve's and three ' sssssss\"",
+"python": "\"twelve's and three ' sssssss\""
+},
+{
+"kind": "punctuation",
+"written": "This is ABC 'second ",
+"expected": "This is ABC 'second",
+"python": "This is ABC 'second"
+},
+{
+"kind": "punctuation",
+"written": "``text 7`` text ``.",
+"expected": "\"text seven\" text \".",
+"python": "\"text seven\" text \"."
+},
+{
+"kind": "punctuation",
+"written": "\"text 7\" text \".",
+"expected": "\"text seven inches text\".",
+"python": "\"text seven inches text\"."
+},
+{
+"kind": "punctuation",
+"written": "\"And now,\" he said, \"He,",
+"expected": "\"And now,\" he said, \"He,",
+"python": "\"And now,\" he said, \"He,"
+},
+{
+"kind": "punctuation",
+"written": "a: \"b\", \"c\", \"d\", \"e\", \"f\" or \"g\".",
+"expected": "a: \"b\", \"c\", \"d\", \"e\", \"f\" or \"g\".",
+"python": "a: \"b\", \"c\", \"d\", \"e\", \"f\" or \"g\"."
+},
+{
+"kind": "punctuation",
+"written": "a: \"b\" \"c\" \"d\" \"e\" \"f\" or \"g\".",
+"expected": "a: \"b\" \"c\" \"d\" \"e\" \"f\" or \"g\".",
+"python": "a: \"b\" \"c\" \"d\" \"e\" \"f\" or \"g\"."
+},
+{
+"kind": "punctuation",
+"written": "a: ``b``, ``c``, ``d``, ``e``, ``f`` or ``g``.",
+"expected": "a: \"b\", \"c\", \"d\", \"e\", \"f\" or \"g\".",
+"python": "a: \"b\", \"c\", \"d\", \"e\", \"f\" or \"g\"."
+},
+{
+"kind": "punctuation",
+"written": "\"And now,\" he said, \"He,",
+"expected": "\"And now,\" he said, \"He,",
+"python": "\"And now,\" he said, \"He,"
+},
+{
+"kind": "punctuation",
+"written": "80's",
+"expected": "eighty's",
+"python": "eighty's"
+},
+{
+"kind": "punctuation",
+"written": "test .b@gmail.com",
+"expected": "test. b at gmail dot com",
+"python": "test. b at gmail dot com"
+},
+{
+"kind": "punctuation",
+"written": "123,000012",
+"expected": "one hundred and twenty three, zero zero zero zero one two",
+"python": "one hundred and twenty three, zero zero zero zero one two"
+},
+{
+"kind": "punctuation",
+"written": "9000,000th",
+"expected": "nine thousand, zero zero zero th",
+"python": "nine thousand, zero zero zero th"
+},
+{
+"kind": "punctuation",
+"written": "16 July, 1943",
+"expected": "the sixteenth of july, nineteen forty three",
+"python": "the sixteenth of july, nineteen forty three"
+},
+{
+"kind": "punctuation",
+"written": "April 29th’s meeting",
+"expected": "april twenty ninth’s meeting",
+"python": "april twenty ninth’s meeting"
+},
+{
+"kind": "punctuation",
+"written": "august 23, 2002",
+"expected": "august twenty third, two thousand two",
+"python": "august twenty third, two thousand two"
+},
+{
+"kind": "punctuation",
+"written": "11:30EST",
+"expected": "eleven: thirty EST",
+"python": "eleven: thirty EST"
+},
+{
+"kind": "punctuation",
+"written": "11:30...",
+"expected": "eleven thirty...",
+"python": "eleven thirty..."
+},
+{
+"kind": "punctuation",
+"written": "11:20AM,2:40PM and 10:10PM.",
+"expected": "eleven twenty AM, two forty PM and ten ten PM.",
+"python": "eleven twenty AM, two forty PM and ten ten PM."
+},
+{
+"kind": "punctuation",
+"written": "dr. Evil",
+"expected": "dr. Evil",
+"python": "dr. Evil"
+},
+{
+"kind": "punctuation",
+"written": "1961–1965 and (2006–2012)",
+"expected": "nineteen sixty one– nineteen sixty five and (two thousand six– twenty twelve)",
+"python": "nineteen sixty one– nineteen sixty five and (two thousand six– twenty twelve)"
+},
+{
+"kind": "punctuation",
+"written": "114...48",
+"expected": "one hundred and fourteen... forty eight",
+"python": "one hundred and fourteen... forty eight"
+},
+{
+"kind": "punctuation",
+"written": "12kg.",
+"expected": "twelve kilograms.",
+"python": "twelve kilograms."
+},
+{
+"kind": "punctuation",
+"written": "<pitch=-.3>123?123</pitch>",
+"expected": "<pitch=-.3> one hundred and twenty three? one hundred and twenty three </pitch>",
+"python": "<pitch=-.3> one hundred and twenty three? one hundred and twenty three </pitch>"
+},
+{
+"kind": "punctuation",
+"written": "2!",
+"expected": "two!",
+"python": "two!"
+},
+{
+"kind": "punctuation",
+"written": "1!hello",
+"expected": "one! hello",
+"python": "one! hello"
+},
+{
+"kind": "punctuation",
+"written": "1, ",
+"expected": "one,",
+"python": "one,"
+},
+{
+"kind": "punctuation",
+"written": "1!!!!",
+"expected": "one!!!!",
+"python": "one!!!!"
+},
+{
+"kind": "punctuation",
+"written": "(1)Hello",
+"expected": "(one) Hello",
+"python": "(one) Hello"
+},
+{
+"kind": "punctuation",
+"written": "ÀÁÂÃ check §- and ƛ, also ɧ",
+"expected": "ÀÁÂÃ check section - and ƛ, also ɧ",
+"python": "ÀÁÂÃ check section - and ƛ, also ɧ"
+},
+{
+"kind": "punctuation",
+"written": "Hi it's 5pm,4A.M.?-34. Hi,no,yes,34! 12,again,4 and NO?17 and $.01,here & there -0.004kg",
+"expected": "Hi it's five PM, four AM.? minus thirty four. Hi,no,yes, thirty four! twelve, again, four and NO? seventeen and one cent, here and there minus zero point zero zero four kilograms",
+"python": "Hi it's five PM, four AM.? minus thirty four. Hi,no,yes, thirty four! twelve, again, four and NO? seventeen and one cent, here and there minus zero point zero zero four kilograms"
+},
+{
+"kind": "punctuation",
+"written": "1°C.",
+"expected": "one degree Celsius.",
+"python": "one degree Celsius."
+},
+{
+"kind": "punctuation",
+"written": "my email is myemail@gmail.com!",
+"expected": "my email is myemail at gmail dot com!",
+"python": "my email is myemail at gmail dot com!"
+},
+{
+"kind": "range",
+"written": "1980-1986",
+"expected": "nineteen eighty to nineteen eighty six",
+"python": "nineteen eighty to nineteen eighty six"
+},
+{
+"kind": "range",
+"written": "from 2-10",
+"expected": "from two - ten",
+"python": "from two - ten"
+},
+{
+"kind": "range",
+"written": "2-5lb",
+"expected": "two to five pounds",
+"python": "two to five pounds"
+},
+{
+"kind": "range",
+"written": "2-5",
+"expected": "two - five",
+"python": "two - five"
+},
+{
+"kind": "range",
+"written": "2x8 m2",
+"expected": "two by eight square meters",
+"python": "two by eight square meters"
+},
+{
+"kind": "range",
+"written": "2x8",
+"expected": "two x eight",
+"python": "two x eight"
+},
+{
+"kind": "range",
+"written": "2+3",
+"expected": "two plus three",
+"python": "two plus three"
+},
+{
+"kind": "range",
+"written": "2+3 m2",
+"expected": "two plus three m two",
+"python": "two plus three m two"
+},
+{
+"kind": "range",
+"written": "170 - 45190",
+"expected": "one hundred and seventy - four five one nine zero",
+"python": "one hundred and seventy - four five one nine zero"
+},
+{
+"kind": "range",
+"written": "1980-1970 kg",
+"expected": "one thousand nine hundred and eighty to one thousand nine hundred and seventy kilograms",
+"python": "one thousand nine hundred and eighty to one thousand nine hundred and seventy kilograms"
+},
+{
+"kind": "range",
+"written": "5pm-7 pm",
+"expected": "five PM to seven PM",
+"python": "five PM to seven PM"
+},
+{
+"kind": "range",
+"written": "4:00 am - 8:12 pm",
+"expected": "four AM to eight twelve PM",
+"python": "four AM to eight twelve PM"
+},
+{
+"kind": "range",
+"written": "978-0",
+"expected": "nine hundred and seventy eight - zero",
+"python": "nine hundred and seventy eight - zero"
+},
+{
+"kind": "range",
+"written": "1960s-80s",
+"expected": "nineteen sixties to eighties",
+"python": "nineteen sixties to eighties"
+},
+{
+"kind": "range",
+"written": "1960s-1980s",
+"expected": "nineteen sixties to nineteen eighties",
+"python": "nineteen sixties to nineteen eighties"
+},
+{
+"kind": "range",
+"written": "1960-80",
+"expected": "nineteen sixty to eighty",
+"python": "nineteen sixty to eighty"
+},
+{
+"kind": "range",
+"written": "mid-1980s",
+"expected": "mid nineteen eighties",
+"python": "mid nineteen eighties"
+},
+{
+"kind": "range",
+"written": "mid-80s",
+"expected": "mid eighties",
+"python": "mid eighties"
+},
+{
+"kind": "range",
+"written": "$250-$300",
+"expected": "two hundred and fifty dollars to three hundred dollars",
+"python": "two hundred and fifty dollars to three hundred dollars"
+},
+{
+"kind": "range",
+"written": "$150.25-$250.67",
+"expected": "one hundred and fifty dollars twenty five cents to two hundred and fifty dollars sixty seven cents",
+"python": "one hundred and fifty dollars twenty five cents to two hundred and fifty dollars sixty seven cents"
+},
+{
+"kind": "roman",
+"written": "Sam II",
+"expected": "Sam second",
+"python": "Sam II"
+},
+{
+"kind": "roman",
+"written": "Chapter IV",
+"expected": "Chapter four",
+"python": "Chapter IV"
+},
+{
+"kind": "roman",
+"written": "PART XL",
+"expected": "PART forty",
+"python": "PART XL"
+},
+{
+"kind": "roman",
+"written": "Sam and I",
+"expected": "Sam and I",
+"python": "Sam and I"
+},
+{
+"kind": "serial",
+"written": "t-0t25d12-f",
+"expected": "t-zero t twenty five d twelve-f",
+"python": "t-zero t twenty five d twelve-f"
+},
+{
+"kind": "serial",
+"written": "133-ABC",
+"expected": "one hundred thirty three-ABC",
+"python": "one hundred thirty three-ABC"
+},
+{
+"kind": "serial",
+"written": "B2A23C",
+"expected": "B two A twenty three C",
+"python": "B two A twenty three C"
+},
+{
+"kind": "serial",
+"written": "25d08A",
+"expected": "twenty five d zero eight A",
+"python": "twenty five d zero eight A"
+},
+{
+"kind": "serial",
+"written": "C24",
+"expected": "C twenty four",
+"python": "C twenty four"
+},
+{
+"kind": "serial",
+"written": "W2s",
+"expected": "W two s",
+"python": "W two s"
+},
+{
+"kind": "serial",
+"written": "1-413-te-b-1-5",
+"expected": "one-four hundred thirteen-te-b-one-five",
+"python": "one-four hundred thirteen-te-b-one-five"
+},
+{
+"kind": "serial",
+"written": "b-c-1-5-b-s-b",
+"expected": "b-c-one-five-b-s-b",
+"python": "b-c-one-five-b-s-b"
+},
+{
+"kind": "serial",
+"written": "MIG-25/235212-asdg",
+"expected": "MIG-twenty five/two three five two one two-asdg",
+"python": "MIG-twenty five/two three five two one two-asdg"
+},
+{
+"kind": "serial",
+"written": "1/f-4s",
+"expected": "one/f-four s",
+"python": "one/f-four s"
+},
+{
+"kind": "serial",
+"written": "1/f",
+"expected": "one per F",
+"python": "one per F"
+},
+{
+"kind": "serial",
+"written": "4s",
+"expected": "four S",
+"python": "four S"
+},
+{
+"kind": "serial",
+"written": "7-eleven",
+"expected": "seven eleven",
+"python": "seven eleven"
+},
+{
+"kind": "serial",
+"written": "2x",
+"expected": "two x",
+"python": "two x"
+},
+{
+"kind": "serial",
+"written": "31/31/100",
+"expected": "thirty one/thirty one/one hundred",
+"python": "thirty one/thirty one/one hundred"
+},
+{
+"kind": "serial",
+"written": "1-8090",
+"expected": "one - eight thousand and ninety",
+"python": "one - eight thousand and ninety"
+},
+{
+"kind": "serial",
+"written": "f++",
+"expected": "f plus plus",
+"python": "f plus plus"
+},
+{
+"kind": "serial",
+"written": "dfsd#sfgsfd$",
+"expected": "dfsd hash sfgsfd dollar",
+"python": "dfsd hash sfgsfd dollar"
+},
+{
+"kind": "serial",
+"written": "dfsd$$sfgsfd$",
+"expected": "dfsd dollar dollar sfgsfd dollar",
+"python": "dfsd dollar dollar sfgsfd dollar"
+},
+{
+"kind": "serial",
+"written": "$12@12%",
+"expected": "dollar twelve at twelve percent",
+"python": "dollar twelve at twelve percent"
+},
+{
+"kind": "serial",
+"written": "@12",
+"expected": "at twelve",
+"python": "at twelve"
+},
+{
+"kind": "serial",
+"written": "12@",
+"expected": "twelve at",
+"python": "twelve at"
+},
+{
+"kind": "serial",
+"written": "@mypizza",
+"expected": "at mypizza",
+"python": "at mypizza"
+},
+{
+"kind": "serial",
+"written": "#mytext#",
+"expected": "hash mytext hash",
+"python": "hash mytext hash"
+},
+{
+"kind": "serial",
+"written": "test$",
+"expected": "test dollar",
+"python": "test dollar"
+},
+{
+"kind": "serial",
+"written": "covid-19",
+"expected": "covid-nineteen",
+"python": "covid-nineteen"
+},
+{
+"kind": "serial",
+"written": "55-millimeters long",
+"expected": "fifty five-millimeters long",
+"python": "fifty five-millimeters long"
+},
+{
+"kind": "serial",
+"written": "a 4-kilogram bag",
+"expected": "a four-kilogram bag",
+"python": "a four-kilogram bag"
+},
+{
+"kind": "serial",
+"written": "100-car",
+"expected": "one hundred-car",
+"python": "one hundred-car"
+},
+{
+"kind": "serial",
+"written": "123/261788/2021",
+"expected": "one hundred twenty three/two six one seven eight eight/two thousand twenty one",
+"python": "one hundred twenty three/two six one seven eight eight/two thousand twenty one"
+},
+{
+"kind": "serial",
+"written": "2*8",
+"expected": "two asterisk eight",
+"python": "two asterisk eight"
+},
+{
+"kind": "special_text",
+"written": "[HH AH0 L OW1]",
+"expected": "[HH AH0 L OW1]",
+"python": "[HH AH0 L OW1]"
+},
+{
+"kind": "special_text",
+"written": "[nəkɫudɔf ˈfɫəʃt... ənd ˈfɛɫt - ˈɔɫˌweɪz ˈdɪd!]",
+"expected": "[nəkɫudɔf ˈfɫəʃt... ənd ˈfɛɫt - ˈɔɫˌweɪz ˈdɪd!]",
+"python": "[nəkɫudɔf ˈfɫəʃt... ənd ˈfɛɫt - ˈɔɫˌweɪz ˈdɪd!]"
+},
+{
+"kind": "special_text",
+"written": "[poʊstˌmɑɹk]",
+"expected": "[poʊstˌmɑɹk]",
+"python": "[poʊstˌmɑɹk]"
+},
+{
+"kind": "special_text",
+"written": "<breathing/>",
+"expected": "<breathing/>",
+"python": "<breathing/>"
+},
+{
+"kind": "special_text",
+"written": "go <noise/> home",
+"expected": "go <noise/> home",
+"python": "go <noise/> home"
+},
+{
+"kind": "special_text",
+"written": "go<noise/>home",
+"expected": "go<noise/>home",
+"python": "go<noise/>home"
+},
+{
+"kind": "special_text",
+"written": "<pausing/>",
+"expected": "<pausing/>",
+"python": "<pausing/>"
+},
+{
+"kind": "special_text",
+"written": "<cough/>",
+"expected": "<cough/>",
+"python": "<cough/>"
+},
+{
+"kind": "special_text",
+"written": "<pitch=-.3>123 123</pitch>",
+"expected": "<pitch=-.3> one hundred and twenty three one hundred and twenty three </pitch>",
+"python": "<pitch=-.3> one hundred and twenty three one hundred and twenty three </pitch>"
+},
+{
+"kind": "special_text",
+"written": "<singing> haleluja </singing>",
+"expected": "<singing> haleluja </singing>",
+"python": "<singing> haleluja </singing>"
+},
+{
+"kind": "telephone",
+"written": "+1 123-123-5678",
+"expected": "plus one, one two three, one two three, five six seven eight",
+"python": "plus one, one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "123-123-5678",
+"expected": "one two three, one two three, five six seven eight",
+"python": "one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "+1-123-123-5678",
+"expected": "plus one, one two three, one two three, five six seven eight",
+"python": "plus one, one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "+1 (123)-123-5678",
+"expected": "plus one, one two three, one two three, five six seven eight",
+"python": "plus one, one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "+1(123) 123-5678",
+"expected": "plus one, one two three, one two three, five six seven eight",
+"python": "plus one, one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "(123)-123-5678",
+"expected": "one two three, one two three, five six seven eight",
+"python": "one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "(123) 123-5678",
+"expected": "one two three, one two three, five six seven eight",
+"python": "one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "123-123-5678-1111",
+"expected": "one two three, one two three, five six seven eight, one one one one",
+"python": "one two three, one two three, five six seven eight, one one one one"
+},
+{
+"kind": "telephone",
+"written": "123-123-5678-1",
+"expected": "one two three, one two three, five six seven eight, one",
+"python": "one two three, one two three, five six seven eight, one"
+},
+{
+"kind": "telephone",
+"written": "1-800-GO-U-HAUL",
+"expected": "one, eight hundred, GO U HAUL",
+"python": "one, eight hundred, GO U HAUL"
+},
+{
+"kind": "telephone",
+"written": "1-800-GO-2-HAUL",
+"expected": "one, eight hundred, GO two, HAUL",
+"python": "one, eight hundred, GO two, HAUL"
+},
+{
+"kind": "telephone",
+"written": "987.987.0.40",
+"expected": "nine eight seven dot nine eight seven dot zero dot four zero",
+"python": "nine eight seven dot nine eight seven dot zero dot four zero"
+},
+{
+"kind": "telephone",
+"written": "call me at +1 123-123-5678",
+"expected": "call me at plus one, one two three, one two three, five six seven eight",
+"python": "call me at plus one, one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "call me at 123-123-5678",
+"expected": "call me at one two three, one two three, five six seven eight",
+"python": "call me at one two three, one two three, five six seven eight"
+},
+{
+"kind": "telephone",
+"written": "123.123.0.40",
+"expected": "one two three dot one two three dot zero dot four zero",
+"python": "one two three dot one two three dot zero dot four zero"
+},
+{
+"kind": "telephone",
+"written": "IP address is 123.123.0.40",
+"expected": "IP address is one two three dot one two three dot zero dot four zero",
+"python": "IP address is one two three dot one two three dot zero dot four zero"
+},
+{
+"kind": "telephone",
+"written": "111-11-1111",
+"expected": "one one one, one one, one one one one",
+"python": "one one one, one one, one one one one"
+},
+{
+"kind": "telephone",
+"written": "my ssn is 111-11-1111",
+"expected": "my SSN is one one one, one one, one one one one",
+"python": "my SSN is one one one, one one, one one one one"
+},
+{
+"kind": "telephone",
+"written": "555.555.5555",
+"expected": "five five five, five five five, five five five five",
+"python": "five five five, five five five, five five five five"
+},
+{
+"kind": "telephone",
+"written": "(555)555-5555",
+"expected": "five five five, five five five, five five five five",
+"python": "five five five, five five five, five five five five"
+},
+{
+"kind": "time",
+"written": "01:00",
+"expected": "one o'clock",
+"python": "one o'clock"
+},
+{
+"kind": "time",
+"written": "01:00 am",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "01:00 a.m.",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "01:00 a.m",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "1 a.m.",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "23:00",
+"expected": "twenty three o'clock",
+"python": "twenty three o'clock"
+},
+{
+"kind": "time",
+"written": "1:00 a.m.",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "1:00a.m.",
+"expected": "one AM",
+"python": "one AM"
+},
+{
+"kind": "time",
+"written": "1.59 p.m.",
+"expected": "one fifty nine PM",
+"python": "one fifty nine PM"
+},
+{
+"kind": "time",
+"written": "01:59 p.m.",
+"expected": "one fifty nine PM",
+"python": "one fifty nine PM"
+},
+{
+"kind": "time",
+"written": "1:59 p.m.",
+"expected": "one fifty nine PM",
+"python": "one fifty nine PM"
+},
+{
+"kind": "time",
+"written": "1:59 p.m. est",
+"expected": "one fifty nine PM EST",
+"python": "one fifty nine PM EST"
+},
+{
+"kind": "time",
+"written": "1:59 p.m.est",
+"expected": "one fifty nine PM EST",
+"python": "one fifty nine PM EST"
+},
+{
+"kind": "time",
+"written": "1:59 p.m. e.s.t",
+"expected": "one fifty nine PM EST",
+"python": "one fifty nine PM EST"
+},
+{
+"kind": "time",
+"written": "10:00:00 p.m. e.s.t",
+"expected": "ten hours zero minutes and zero seconds PM EST",
+"python": "ten hours zero minutes and zero seconds PM EST"
+},
+{
+"kind": "time",
+"written": "1:01:01",
+"expected": "one hour one minute and one second",
+"python": "one hour one minute and one second"
+},
+{
+"kind": "time",
+"written": "14:10:30",
+"expected": "fourteen hours ten minutes and thirty seconds",
+"python": "fourteen hours ten minutes and thirty seconds"
+},
+{
+"kind": "time",
+"written": "2pm-5pm",
+"expected": "two PM to five PM",
+"python": "two PM to five PM"
+},
+{
+"kind": "time",
+"written": "5pm",
+"expected": "five PM",
+"python": "five PM"
+},
+{
+"kind": "time",
+"written": "21:51:31",
+"expected": "twenty one hours fifty one minutes and thirty one seconds",
+"python": "twenty one hours fifty one minutes and thirty one seconds"
+},
+{
+"kind": "time",
+"written": "01:01:01",
+"expected": "one hour one minute and one second",
+"python": "one hour one minute and one second"
+},
+{
+"kind": "whitelist",
+"written": "Dr. Evil",
+"expected": "doctor Evil",
+"python": "doctor Evil"
+},
+{
+"kind": "whitelist",
+"written": "Mrs. Norris",
+"expected": "misses Norris",
+"python": "misses Norris"
+},
+{
+"kind": "whitelist",
+"written": "DNA is",
+"expected": "DNA is",
+"python": "DNA is"
+},
+{
+"kind": "whitelist",
+"written": "C. S. Lewis",
+"expected": "CS Lewis",
+"python": "CS Lewis"
+},
+{
+"kind": "whitelist",
+"written": "tv",
+"expected": "TV",
+"python": "TV"
+},
+{
+"kind": "whitelist",
+"written": "and/or",
+"expected": "and/or",
+"python": "and/or"
+},
+{
+"kind": "whitelist",
+"written": "Our company offers a 401(k) retirement savings plan",
+"expected": "Our company offers a four oh one k retirement savings plan",
+"python": "Our company offers a four oh one k retirement savings plan"
+},
+{
+"kind": "word",
+"written": "",
+"expected": "",
+"python": ""
+},
+{
+"kind": "word",
+"written": " ",
+"expected": "",
+"python": ""
+},
+{
+"kind": "word",
+"written": " 1",
+"expected": "one",
+"python": "one"
+},
+{
+"kind": "word",
+"written": " no",
+"expected": "no",
+"python": "no"
+},
+{
+"kind": "word",
+"written": "May I come in?",
+"expected": "May I come in?",
+"python": "May I come in?"
+},
+{
+"kind": "word",
+"written": "Yes you may.",
+"expected": "Yes you may.",
+"python": "Yes you may."
+},
+{
+"kind": "word",
+"written": "On the mar.",
+"expected": "On the mar.",
+"python": "On the mar."
+},
+{
+"kind": "word",
+"written": "es3",
+"expected": "es three",
+"python": "es three"
+},
+{
+"kind": "word",
+"written": "x ",
+"expected": "x",
+"python": "x"
+},
+{
+"kind": "word",
+"written": "X!",
+"expected": "X!",
+"python": "X!"
+},
+{
+"kind": "word",
+"written": "—",
+"expected": "—",
+"python": "—"
+},
+{
+"kind": "word",
+"written": "aabach",
+"expected": "aabach",
+"python": "aabach"
+},
+{
+"kind": "word",
+"written": "aabenraa",
+"expected": "aabenraa",
+"python": "aabenraa"
+},
+{
+"kind": "word",
+"written": "aabye",
+"expected": "aabye",
+"python": "aabye"
+},
+{
+"kind": "word",
+"written": "aaccessed",
+"expected": "aaccessed",
+"python": "aaccessed"
+},
+{
+"kind": "word",
+"written": "aach",
+"expected": "aach",
+"python": "aach"
+},
+{
+"kind": "word",
+"written": "aachen's",
+"expected": "aachen's",
+"python": "aachen's"
+},
+{
+"kind": "word",
+"written": "aadri",
+"expected": "aadri",
+"python": "aadri"
+},
+{
+"kind": "word",
+"written": "aafia",
+"expected": "aafia",
+"python": "aafia"
+},
+{
+"kind": "word",
+"written": "aagaard",
+"expected": "aagaard",
+"python": "aagaard"
+},
+{
+"kind": "word",
+"written": "aagadu",
+"expected": "aagadu",
+"python": "aagadu"
+},
+{
+"kind": "word",
+"written": "aagard",
+"expected": "aagard",
+"python": "aagard"
+},
+{
+"kind": "word",
+"written": "aagathadi",
+"expected": "aagathadi",
+"python": "aagathadi"
+},
+{
+"kind": "word",
+"written": "aaghart's",
+"expected": "aaghart's",
+"python": "aaghart's"
+},
+{
+"kind": "word",
+"written": "aalem",
+"expected": "aalem",
+"python": "aalem"
+},
+{
+"kind": "word",
+"written": "a'ali",
+"expected": "a'ali",
+"python": "a'ali"
+},
+{
+"kind": "word",
+"written": "aaliyan's",
+"expected": "aaliyan's",
+"python": "aaliyan's"
+},
+{
+"kind": "word",
+"written": "mother-in-law",
+"expected": "mother-in-law",
+"python": "mother-in-law"
+},
+{
+"kind": "word",
+"written": "there -0.4kg",
+"expected": "there minus zero point four kilograms",
+"python": "there minus zero point four kilograms"
+},
+{
+"kind": "word",
+"written": "there- -0.4kg",
+"expected": "there- minus zero point four kilograms",
+"python": "there- minus zero point four kilograms"
+},
+{
+"kind": "word",
+"written": "$ and 5% or %",
+"expected": "dollar and five percent or percent",
+"python": "dollar and five percent or percent"
+},
+{
+"kind": "word",
+"written": " 1",
+"expected": "one",
+"python": "one"
+},
+{
+"kind": "word",
+"written": "1",
+"expected": "one",
+"python": "one"
+},
+{
+"kind": "word",
+"written": "!1",
+"expected": "! one",
+"python": "! one"
+},
+{
+"kind": "word",
+"written": "mar",
+"expected": "mar",
+"python": "mar"
+},
+{
+"kind": "word",
+"written": "/$€₩£BB¥#%AA and $€₩£¥#%",
+"expected": "slash dollar euro won pound BB yen hash percent AA and dollar euro won pound yen hash percent",
+"python": "slash dollar euro won pound BB yen hash percent AA and dollar euro won pound yen hash percent"
+},
+{
+"kind": "word",
+"written": "love him while we may,",
+"expected": "love him while we may,",
+"python": "love him while we may,"
+},
+{
+"kind": "word",
+"written": "mar",
+"expected": "mar",
+"python": "mar"
+},
+{
+"kind": "word",
+"written": "i saw (22) ducklings",
+"expected": "i saw (twenty two) ducklings",
+"python": "i saw (twenty two) ducklings"
+}
+]

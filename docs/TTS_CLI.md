@@ -61,8 +61,12 @@ macOS      M AE1 K OW0 EH2 S
 Words may contain only ASCII letters and apostrophes; symbols such as `&`, `…`
 or `/` and words with digits (`MP4`) still need spelling out in the text.
 
-`--guess-unknown` makes words the dictionary lacks speakable instead of
-refusing them, in this order: split at capitals into known words (`PromoShot`,
+`--guess-unknown` turns on narration mode. Text is first normalized by NVIDIA
+NeMo's English grammars, bundled and run natively (see
+[LANGUAGE.md](LANGUAGE.md#narration-mode-nemo)): money, percentages, dates,
+times, years and decades, scores and ranges, measures, ordinals, fractions,
+telephone numbers, abbreviations, @handles and URLs. Then words the dictionary
+lacks become speakable instead of refused, in this order: split at capitals into known words (`PromoShot`,
 `ChatGPT`, `CloudKit`), spell 2–5 letter capitals not already expanded by the
 normalizer (`SDK`), split run-together known words (`screenrecorder`), and
 otherwise ask a small grapheme-to-phoneme model (`assets/g2p-en-v1.bin`, 5.9 MB,

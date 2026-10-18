@@ -171,8 +171,15 @@ impl English {
         self.phonemize_impl(text, true, true)
     }
     fn phonemize_impl(&self, text: &str, current: bool, american: bool) -> Result<String, String> {
+        // Narration mode (the fallback on): NeMo's English grammars read the
+        // money, dates, times, measures, URLs… that strict text-v1 refuses.
+        let narration = current && self.fallback.is_some();
+        let prepared = narration.then(|| crate::english_tolerant::prepare(text));
+        let text = prepared.as_deref().unwrap_or(text);
         let original = text;
-        let text = if current {
+        let text = if narration {
+            crate::nemo::normalize(text)?
+        } else if current {
             crate::text::expand(text, crate::Language::En)?
         } else {
             crate::english_numbers::expand(text)?
@@ -188,15 +195,56 @@ impl English {
             .filter(|w| !w.is_empty())
             .map(|w| (w.to_lowercase(), w.to_string()))
             .collect();
+        // How capitals were written, for spelling acronyms in narration.
+        let tokens: Vec<&str> = original
+            .split(|c: char| !(c.is_ascii_alphabetic() || c == '\''))
+            .filter(|w| !w.is_empty())
+            .collect();
+        let caps = |w: &str| w.len() >= 2 && w.chars().all(|c| c.is_ascii_uppercase());
+        let written_caps: std::collections::HashSet<&str> =
+            tokens.iter().copied().filter(|w| caps(w)).collect();
+        // A run of capitalized words is a shouted headline: read as words.
+        let shouted: std::collections::HashSet<&str> = (0..tokens.len())
+            .filter(|&i| {
+                caps(tokens[i])
+                    && (i > 0 && caps(tokens[i - 1]) || tokens.get(i + 1).is_some_and(|n| caps(n)))
+            })
+            .map(|i| tokens[i])
+            .collect();
+        let spell = |w: &str| -> Option<String> {
+            if !narration || !(2..=5).contains(&w.len()) || !caps(w) {
+                return None;
+            }
+            if !written_caps.contains(w) {
+                return acronym(w); // NeMo's own capitals: AM, PM, a domain's DE
+            }
+            if shouted.contains(w) || w.len() > 3 || SHOUTED_WORDS.contains(&w) {
+                return None; // a headline, NASA from the dictionary, "Download NOW"
+            }
+            acronym(w) // EST, CEO, the IT team
+        };
         let mut index = 0;
         let mut out = String::new();
         let mut word = String::new();
         let mut flush = |word: &mut String, out: &mut String| -> Result<(), String> {
             if !word.is_empty() {
+                let spelled = if self.overrides.contains_key(&word.to_lowercase()) {
+                    None
+                } else {
+                    spell(word)
+                };
                 let start = out.len();
                 let overridden = self.overrides.contains_key(&word.to_lowercase());
                 if let Some(pronunciation) = self.overrides.get(&word.to_lowercase()) {
                     out.push_str(pronunciation);
+                } else if let Some(letters) = spelled {
+                    out.push_str(
+                        &letters
+                            .split_whitespace()
+                            .map(phone)
+                            .collect::<Result<Vec<_>, _>>()?
+                            .join(""),
+                    );
                 } else if let Some(Some(phones)) = readings.get(index) {
                     out.push_str(
                         &phones
@@ -256,6 +304,12 @@ impl English {
                     }
                     '.' | ',' | '!' | '?' | ';' | ':' => out.push(c),
                     '-' | '—' | '(' | ')' | '"' => out.push(' '),
+                    // Narration never fails on a stray symbol NeMo left: a pause.
+                    c if narration && !c.is_alphanumeric() => {
+                        if !out.ends_with(' ') {
+                            out.push(' ');
+                        }
+                    }
                     _ => {
                         return Err(format!(
                             "Unsupported character '{c}'. Spell out this symbol or use phoneme input."
@@ -280,12 +334,51 @@ impl English {
             .get(&lower)
             .cloned()
             .unwrap_or_else(|| word.to_string());
-        let (arpabet, method) = self
-            .split_at_capitals(&original)
-            .map(|a| (a, "parts"))
-            .or_else(|| acronym(&original).map(|a| (a, "letters")))
-            .or_else(|| self.compound(&lower).map(|a| (a, "compound")))
-            .or_else(|| model.guess(&lower).map(|p| (p.join(" "), "model")))?;
+        let resolve = |written: &str| -> Option<(String, &'static str)> {
+            let lower = written.to_lowercase();
+            self.arpabet(&lower)
+                .map(|a| (a, "dictionary"))
+                .or_else(|| self.split_at_capitals(written).map(|a| (a, "parts")))
+                .or_else(|| acronym(written).map(|a| (a, "letters")))
+                .or_else(|| self.compound(&lower).map(|a| (a, "compound")))
+                .or_else(|| {
+                    // A full diphthong the model left unstressed (phytotaxa's
+                    // AY0) reads reduced; give it secondary stress.
+                    model.guess(&lower).map(|p| {
+                        let p: Vec<String> = p
+                            .into_iter()
+                            .map(|ph| match ph.as_str() {
+                                "AY0" | "EY0" | "AW0" | "OY0" => ph.replace('0', "2"),
+                                _ => ph,
+                            })
+                            .collect();
+                        (p.join(" "), "model")
+                    })
+                })
+        };
+        // KDKA's, APIs, PromoShot's: the base word, then the ending its last
+        // sound takes. Guessing the whole token made "KDKA's" into "kiz".
+        let base = original
+            .strip_suffix("'s")
+            .or_else(|| {
+                original
+                    .strip_suffix('s')
+                    .filter(|b| b.len() >= 2 && b.chars().all(|c| c.is_ascii_uppercase()))
+            })
+            .filter(|b| !b.is_empty());
+        let (arpabet, method) = match base {
+            Some(base) => {
+                let (stem, method) = resolve(base)?;
+                let last = stem.split_whitespace().last().unwrap_or_default();
+                let ending = match last.trim_end_matches(['0', '1', '2']) {
+                    "S" | "Z" | "SH" | "ZH" | "CH" | "JH" => "IH0 Z",
+                    "P" | "T" | "K" | "F" | "TH" => "S",
+                    _ => "Z",
+                };
+                (format!("{stem} {ending}"), method)
+            }
+            None => resolve(&original)?,
+        };
         let spoken = arpabet
             .split_whitespace()
             .map(phone)
@@ -335,8 +428,9 @@ impl English {
         spoken.map(|s| s.join(" "))
     }
 
-    /// `screenrecorder` → screen + recorder: two or three known words of at
-    /// least three letters each, the fewest parts winning.
+    /// `screenrecorder` → screen + recorder: exactly two known words of at
+    /// least four letters each. Shorter pieces are too easy to find by
+    /// accident (phytotaxa is not phy + tot + axa); the model reads those.
     fn compound(&self, word: &str) -> Option<String> {
         if word.len() < 6 || !word.is_ascii() {
             return None;
@@ -345,12 +439,12 @@ impl English {
         // best[i]: the fewest parts covering word[..i], with their split points.
         let mut best: Vec<Option<Vec<usize>>> = vec![None; n + 1];
         best[0] = Some(Vec::new());
-        for end in 3..=n {
-            for begin in 0..=end.saturating_sub(3) {
+        for end in 4..=n {
+            for begin in 0..=end.saturating_sub(4) {
                 let Some(prefix) = best[begin].clone() else {
                     continue;
                 };
-                if prefix.len() >= 3 || !self.arpabet.contains_key(&word[begin..end]) {
+                if prefix.len() >= 2 || !self.arpabet.contains_key(&word[begin..end]) {
                     continue;
                 }
                 let mut cuts = prefix;
@@ -440,6 +534,17 @@ fn flap(spoken: &str) -> String {
     }
     out
 }
+
+/// Short words promo copy capitalizes for emphasis ("Download NOW", "the
+/// NEW app"): read as words, where other short capitals (EST, CEO) are spelled.
+const SHOUTED_WORDS: &[&str] = &[
+    "NO", "GO", "UP", "ON", "IN", "TO", "DO", "BE", "WE", "MY", "ME", "SO", "OR", "AT", "BY", "IF",
+    "OF", "AN", "AS", "IS", "HE", "NEW", "NOW", "GET", "BUY", "WIN", "TOP", "HOT", "BIG", "YES",
+    "ALL", "OFF", "OUR", "YOU", "THE", "AND", "FOR", "ONE", "TWO", "TEN", "FUN", "WOW", "TRY",
+    "ADD", "OUT", "NOT", "ANY", "WAY", "DAY", "PRO", "MAX", "LOW", "OLD", "SEE", "HOW", "WHY",
+    "WHO", "ARE", "CAN", "HAS", "HAD", "WAS", "LET", "SET", "RUN", "FAN", "BOX", "SIX", "RED",
+    "WON", "OWN", "USE", "ASK", "ART", "APP", "JOB", "MAP", "TIP", "YET", "NOR", "BUT",
+];
 
 /// Letter names in ARPAbet, for spelling an acronym.
 const LETTER_NAMES: [&str; 26] = [
@@ -649,16 +754,17 @@ mod tests {
         let mut frontend = English::load(&path).unwrap();
         assert!(frontend.phonemize("Meet Figma.").is_err(), "off by default");
         frontend.set_fallback(true).unwrap();
-        frontend
+        let spoken = frontend
             .phonemize("Meet PromoShot, ChatGPT, the SDK and screenrecorder, by Figma.")
             .unwrap();
+        assert!(spoken.contains("ˌɛsdˌikˈA"), "SDK spelled: {spoken}");
         let guesses = frontend.take_guesses();
         let by_word = |w: &str| guesses.iter().find(|g| g.word == w).unwrap().clone();
         assert_eq!(by_word("PromoShot").arpabet, "P R OW1 M OW0 SH AA1 T");
         assert_eq!(by_word("PromoShot").method, "parts");
         assert_eq!(by_word("ChatGPT").arpabet, "CH AE1 T JH IY2 P IY2 T IY1");
-        assert_eq!(by_word("SDK").arpabet, "EH2 S D IY2 K EY1");
-        assert_eq!(by_word("SDK").method, "letters");
+        // Short capitals are spelled by rule in narration, not guessed.
+        assert!(guesses.iter().all(|g| g.word != "SDK"));
         assert_eq!(by_word("screenrecorder").method, "compound");
         assert_eq!(by_word("Figma").method, "model");
         assert!(
@@ -667,5 +773,33 @@ mod tests {
             by_word("Figma")
         );
         assert!(frontend.take_guesses().is_empty(), "taken once");
+    }
+    #[test]
+    fn possessives_plurals_and_tolerant_forms_resolve_their_base() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cmudict.dict");
+        std::fs::write(&path, "promo P R OW1 M OW0\nshot SH AA1 T\nnews N UW1 Z\n").unwrap();
+        let mut frontend = English::load(&path).unwrap();
+        frontend.set_fallback(true).unwrap();
+        frontend
+            .phonemize("KDKA's news, PromoShot's news, URLs.")
+            .unwrap();
+        let guesses = frontend.take_guesses();
+        let by_word = |w: &str| {
+            guesses
+                .iter()
+                .find(|g| g.word == w)
+                .unwrap()
+                .arpabet
+                .clone()
+        };
+        assert_eq!(by_word("KDKA's"), "K EY2 D IY2 K EY2 EY1 Z");
+        assert_eq!(by_word("PromoShot's"), "P R OW1 M OW0 SH AA1 T S");
+        assert_eq!(by_word("URL's"), "Y UW2 AA2 R EH1 L Z");
+        // The tolerant pass only runs with the fallback on.
+        let mut strict = English::load(&path).unwrap();
+        assert!(strict.phonemize("news at 3 p.m.").is_err());
+        strict.set_fallback(true).unwrap();
+        assert!(strict.phonemize("news at 3 p.m.").is_ok());
     }
 }
