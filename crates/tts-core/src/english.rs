@@ -88,7 +88,7 @@ impl English {
     }
     fn ipa(&self, text: &str, current: bool) -> Result<String, String> {
         Ok(self
-            .phonemize_impl(text, current)?
+            .phonemize_impl(text, current, false)?
             .chars()
             .map(|c| match c {
                 'A' => "eɪ".into(),
@@ -102,9 +102,18 @@ impl English {
     }
 
     pub fn phonemize(&self, text: &str) -> Result<String, String> {
-        self.phonemize_impl(text, true)
+        self.phonemize_impl(text, true, false)
     }
-    fn phonemize_impl(&self, text: &str, current: bool) -> Result<String, String> {
+    /// [`Self::phonemize`] with American connected-speech cues for Kokoro's
+    /// US voices: function words lose their citation stress and an
+    /// intervocalic t/d before an unstressed vowel becomes the flap ɾ, as
+    /// in the misaki phonemizer Kokoro was trained with. Without them every
+    /// word is stressed and every t is hard, which sounds foreign. User
+    /// lexicon entries are used exactly as written.
+    pub fn phonemize_american(&self, text: &str) -> Result<String, String> {
+        self.phonemize_impl(text, true, true)
+    }
+    fn phonemize_impl(&self, text: &str, current: bool, american: bool) -> Result<String, String> {
         let text = if current {
             crate::text::expand(text, crate::Language::En)?
         } else {
@@ -120,6 +129,8 @@ impl English {
         let mut word = String::new();
         let mut flush = |word: &mut String, out: &mut String| -> Result<(), String> {
             if !word.is_empty() {
+                let start = out.len();
+                let overridden = self.overrides.contains_key(&word.to_lowercase());
                 if let Some(pronunciation) = self.overrides.get(&word.to_lowercase()) {
                     out.push_str(pronunciation);
                 } else if let Some(Some(phones)) = readings.get(index) {
@@ -156,6 +167,10 @@ impl English {
                             "Unknown word '{word}'. Add a CMU-format pronunciation to the dictionary or use phoneme input."
                         ));
                     }
+                }
+                if american && !overridden {
+                    let spoken = out.split_off(start);
+                    out.push_str(&connected_us(&word.to_lowercase(), &spoken));
                 }
                 index += 1;
                 word.clear();
@@ -217,6 +232,48 @@ impl English {
             None
         }
     }
+}
+
+/// Words English speech leaves unstressed in running text. Their CMU
+/// citation forms carry primary stress, which Kokoro then voices.
+const FUNCTION_WORDS: &[&str] = &[
+    "a", "an", "the", "and", "or", "but", "nor", "if", "as", "than", "of", "to", "in", "on", "at",
+    "by", "for", "from", "with", "into", "onto", "is", "are", "was", "were", "be", "been", "am",
+    "has", "have", "had", "do", "does", "did", "can", "could", "will", "would", "shall", "should",
+    "may", "might", "must", "i", "me", "my", "we", "us", "our", "you", "your", "he", "him", "his",
+    "she", "her", "it", "its", "it's", "they", "them", "their", "i'm", "you're", "we're",
+    "they're", "he's", "she's", "i'll", "you'll", "we'll", "i've", "you've", "we've",
+];
+
+/// One word's Kokoro phonemes with American connected-speech cues.
+fn connected_us(word: &str, spoken: &str) -> String {
+    if FUNCTION_WORDS.contains(&word) {
+        return spoken.replace(['ˈ', 'ˌ'], "");
+    }
+    flap(spoken)
+}
+
+/// American flapping inside a word: t after a vowel or ɹ and before an
+/// unstressed vowel is ɾ (better, water, city, party). Only t: a flapped d
+/// is far less regular (video keeps its d). Not before a
+/// syllabic n (button, written), where American English has a glottal
+/// stop instead; not before a stressed vowel (hotel, attack).
+fn flap(spoken: &str) -> String {
+    const VOWELS: &str = "aeiouæɑɐɒɔəɛɜɪʊʌAIOWYᵊᵻ";
+    let chars: Vec<char> = spoken.chars().collect();
+    let mut out = String::with_capacity(spoken.len());
+    for (i, &c) in chars.iter().enumerate() {
+        let before = i.checked_sub(1).map(|j| chars[j]);
+        let after = chars.get(i + 1).copied();
+        let flapped = c == 't'
+            && before.is_some_and(|b| VOWELS.contains(b) || b == 'ɹ')
+            && after.is_some_and(|a| VOWELS.contains(a))
+            && !(after == Some('ə')
+                && chars.get(i + 2) == Some(&'n')
+                && chars.get(i + 3).is_none_or(|n| !VOWELS.contains(*n)));
+        out.push(if flapped { 'ɾ' } else { c });
+    }
+    out
 }
 
 fn phone(value: &str) -> Result<String, String> {
@@ -333,5 +390,16 @@ mod tests {
             std::fs::write(&path, bad).unwrap();
             assert!(frontend.add_lexicon(&path).is_err(), "{bad}");
         }
+    }
+    #[test]
+    fn american_cues_unstress_function_words_and_flap_t() {
+        assert_eq!(connected_us("for", "fˈɔɹ"), "fɔɹ");
+        assert_eq!(flap("bˈɛtəɹ"), "bˈɛɾəɹ");
+        assert_eq!(flap("sˈɪti"), "sˈɪɾi");
+        assert_eq!(flap("pˈɑɹti"), "pˈɑɹɾi");
+        assert_eq!(flap("hOtˈɛl"), "hOtˈɛl");
+        assert_eq!(flap("bˈʌtən"), "bˈʌtən");
+        assert_eq!(flap("vˈɪdiO"), "vˈɪdiO");
+        assert_eq!(flap("tˈim"), "tˈim");
     }
 }

@@ -123,7 +123,7 @@ impl Kokoro {
     }
 
     pub fn phonemize(&self, text: &str) -> Result<String, Error> {
-        self.frontend.phonemize(text).map_err(Error)
+        self.frontend.phonemize_american(text).map_err(Error)
     }
 
     /// Adds CMU-format user pronunciations; see [`English::add_lexicon`].

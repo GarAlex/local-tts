@@ -2194,7 +2194,7 @@ checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
 
 [[package]]
 name = "local-tts-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "local-tts-core",
  "serde_json",
@@ -2202,7 +2202,7 @@ dependencies = [
 
 [[package]]
 name = "local-tts-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "cc",
  "hound",
@@ -2221,14 +2221,14 @@ dependencies = [
 
 [[package]]
 name = "local-tts-ffi"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "local-tts-core",
 ]
 
 [[package]]
 name = "local-tts-speak"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "local-tts-core",
  "serde_json",
@@ -4134,7 +4134,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
 name = "tts-studio"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "cpal",
  "eframe",
