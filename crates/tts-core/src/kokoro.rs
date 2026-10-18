@@ -271,22 +271,33 @@ impl Kokoro {
         let mut padded = vec![0];
         padded.extend(tokens);
         padded.push(0);
-        let run = || -> Result<Audio, Box<dyn std::error::Error>> {
+        // The model is deterministic here, but on some hosts (an emulated x86
+        // container, for one) a run occasionally yields NaN samples that the
+        // same input does not reproduce; another run of the same chunk recovers.
+        const ATTEMPTS: usize = 3;
+        let mut run = || -> Result<Option<Audio>, Box<dyn std::error::Error>> {
             let outputs = self.session.run(ort::inputs![
-                "input_ids" => Tensor::from_array(Array2::from_shape_vec((1, padded.len()), padded)?)?,
-                "style" => Tensor::from_array(Array2::from_shape_vec((1, 256), style)?)?,
+                "input_ids" => Tensor::from_array(Array2::from_shape_vec((1, padded.len()), padded.clone())?)?,
+                "style" => Tensor::from_array(Array2::from_shape_vec((1, 256), style.clone())?)?,
                 "speed" => Tensor::from_array(([1usize], vec![1.0 / duration_scale]))?
             ])?;
             let (_, samples) = outputs[0].try_extract_tensor::<f32>()?;
             if samples.is_empty() || samples.iter().any(|s| !s.is_finite()) {
-                return Err("model produced invalid audio".into());
+                return Ok(None);
             }
-            Ok(Audio {
+            Ok(Some(Audio {
                 sample_rate: 24000,
                 samples: samples.to_vec(),
-            })
+            }))
         };
-        run().map_err(|e| Error(e.to_string()))
+        for _ in 0..ATTEMPTS {
+            if let Some(audio) = run().map_err(|e| Error(e.to_string()))? {
+                return Ok(audio);
+            }
+        }
+        Err(Error(format!(
+            "model produced invalid audio {ATTEMPTS} times in a row for this chunk"
+        )))
     }
 }
 

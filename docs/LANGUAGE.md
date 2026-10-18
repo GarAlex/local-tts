@@ -171,10 +171,16 @@ text-v1 contract to NVIDIA NeMo's English text-normalization grammars
 and run natively by `crate::nemo`. Trained VITS voices keep text-v1 unless the
 mode is switched on.
 
-The pipeline: accented Latin letters are folded (Kīlauea → Kilauea);
-multipliers (2.5x → 2.5 times) and Roman numerals after a numbering word
-(Chapter IV, World War II, Super Bowl LVIII) are rewritten, because NeMo's cased
-English grammars leave both as written; NeMo normalizes a sentence at a time;
+The pipeline: accented Latin letters are folded (Kīlauea → Kilauea); a few
+forms NeMo reads awkwardly or leaves as written are rewritten into ones it
+reads well — web addresses lose `https://` and `www.`, multipliers (2.5x →
+2.5 times), a score beside a game word (won 112-108 → 112 to 108), units per
+unit (km/h → km per hour), a unit used as an adjective after a/an (a 5 kg
+camera → a 5 kilogram camera), US and European time zones after a time
+(9 a.m. PT → Pacific Time), Roman numerals after a numbering word (Chapter IV,
+World War II) or a regnal name (Louis XIV → the fourteenth) or another
+capitalized word up to XXXIX (Rocky II); NeMo normalizes a sentence at a time;
+its British "one hundred and eight" loses the "and";
 then each word is read from the user lexicon, the dictionary, or the
 unknown-word fallback. All-capital tokens NeMo produced (AM, PM) are spelled,
 as are short isolated ones the text wrote (EST, CEO, the IT team), unless they
@@ -189,9 +195,19 @@ Python NeMo matches the cases' expected answers on 490, the native runner on 488
 A typical sentence normalizes in under 20 ms on an M4 Pro; loading the grammars
 takes about 10 ms, once per process.
 
-Known NeMo gaps, as of r1.2.0: a score such as 112-108 is read as a range
-("one hundred and twelve, one hundred and eight"); `5 kg camera` reads
-"five kilograms camera"; `km/h` reads "kilometers per H"; domains are read
-as words or letters by NeMo's own rules (promoshot dot app). These are
-NeMo's behaviour, and the place to fix them is NeMo's grammars.
+Words are read from the user's lexicon first, then from a small bundled
+narration lexicon (`assets/narration-en.dict`) for names and brands CMUdict
+lacks or reads with an older pronunciation (Meta, which CMUdict records as
+"Mita"; Norte; Canva; Kubernetes), then from CMUdict. Lexicon entries are
+used exactly as written, without the American flap or destressing.
+
+Spelled letters reach the voice one word per letter, so "3:19 AM" stays
+two letters. Guesses from the unknown-word model carry its confidence; below
+−0.08 (`Guess::unsure`) a guess differed from CMUdict on 62–81% of held-out
+words, so those are reported first for checking by ear. A rule-based
+"foreign-style" reading was measured against the model on the same held-out
+words and lost even on the model's least confident vowel-final words
+(37% vs 23.5% phone error): CMUdict records how English speakers say foreign
+names, and the model has learned that. Names it gets wrong are pinned in the
+project's lexicon.
 

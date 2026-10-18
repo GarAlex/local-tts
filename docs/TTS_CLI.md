@@ -74,7 +74,9 @@ bundled — no download). The model was trained here only on the BSD CMU
 dictionary (`training/g2p/train_g2p.py`); on 3,101 held-out dictionary words it
 gets 31.7% of words wrong in some phone or stress and 8.5% of phones wrong, so
 treat its guesses as drafts. Every guess is printed to stderr as a lexicon line,
-and `--json` lists them under `"guessed"`: pin or correct one with `--lexicon`.
+and `--json` lists them under `"guessed"`, each with the model's `"confidence"`
+and `"unsure": true` when it is below −0.08 (such guesses are wrong most of the
+time): pin or correct one with `--lexicon`.
 Without the flag, unknown words still fail exactly as before.
 
 `--json` prints one line on stdout after the WAV is committed:

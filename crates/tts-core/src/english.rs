@@ -13,10 +13,18 @@ pub struct English {
     source: std::path::PathBuf,
     /// ARPAbet by word, filled only while the fallback is on.
     arpabet: HashMap<String, String>,
+    /// The bundled narration lexicon (assets/narration-en.dict), as phones,
+    /// filled only while the fallback is on: over the dictionary, under the
+    /// user's own lexicon.
+    narration: HashMap<String, String>,
 }
 
+/// Names and brands CMUdict lacks or reads with an older pronunciation
+/// (Meta as "Mita"), used in narration mode.
+const NARRATION_LEXICON: &str = include_str!("../../../assets/narration-en.dict");
+
 /// A pronunciation the fallback made up for a word the dictionary lacks.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Guess {
     /// The word as written (its original capitals).
     pub word: String,
@@ -25,6 +33,20 @@ pub struct Guess {
     /// `parts` (split at capitals into known words), `letters` (an acronym),
     /// `compound` (known words run together) or `model` (the trained guesser).
     pub method: &'static str,
+    /// For `model` guesses, the mean log-probability of the chosen phones.
+    pub confidence: Option<f32>,
+}
+
+impl Guess {
+    /// Below this confidence a model guess is wrong most of the time: on
+    /// held-out CMUdict words, 62–81% of such guesses differ from the
+    /// dictionary, against 1–12% above −0.004.
+    pub const UNSURE_BELOW: f32 = -0.08;
+
+    /// A guess worth checking by ear before publishing.
+    pub fn unsure(&self) -> bool {
+        self.confidence.is_some_and(|c| c < Self::UNSURE_BELOW)
+    }
 }
 
 /// Size cap for a user lexicon file.
@@ -58,6 +80,7 @@ impl English {
             guesses: Default::default(),
             source: path.to_path_buf(),
             arpabet: HashMap::new(),
+            narration: HashMap::new(),
         })
     }
 
@@ -70,7 +93,19 @@ impl English {
         if !enabled {
             self.fallback = None;
             self.arpabet.clear();
+            self.narration.clear();
             return Ok(());
+        }
+        for line in NARRATION_LEXICON.lines().filter(|l| !l.starts_with(";;;")) {
+            let mut parts = line.split_whitespace();
+            let Some(word) = parts.next() else { continue };
+            let phones: Vec<&str> = parts.collect();
+            let spoken = phones
+                .iter()
+                .map(|p| phone(p))
+                .collect::<Result<Vec<_>, _>>()?;
+            self.narration.insert(word.to_lowercase(), spoken.join(""));
+            self.arpabet.insert(word.to_lowercase(), phones.join(" "));
         }
         let data = std::fs::read_to_string(&self.source).map_err(|e| e.to_string())?;
         for line in data.lines().filter(|l| !l.starts_with(";;;")) {
@@ -178,7 +213,7 @@ impl English {
         let text = prepared.as_deref().unwrap_or(text);
         let original = text;
         let text = if narration {
-            crate::nemo::normalize(text)?
+            american_numbers(&crate::nemo::normalize(text)?)
         } else if current {
             crate::text::expand(text, crate::Language::En)?
         } else {
@@ -239,8 +274,12 @@ impl English {
                     spell(word)
                 };
                 let start = out.len();
-                let overridden = self.overrides.contains_key(&word.to_lowercase());
+                // Lexicon entries are exact: no American flap or destressing.
+                let overridden = self.overrides.contains_key(&word.to_lowercase())
+                    || self.narration.contains_key(&word.to_lowercase());
                 if let Some(pronunciation) = self.overrides.get(&word.to_lowercase()) {
+                    out.push_str(pronunciation);
+                } else if let Some(pronunciation) = self.narration.get(&word.to_lowercase()) {
                     out.push_str(pronunciation);
                 } else if spelled.is_some() {
                     out.push_str(&spoken_letters(word).ok_or("cannot spell")?);
@@ -334,6 +373,7 @@ impl English {
             .get(&lower)
             .cloned()
             .unwrap_or_else(|| word.to_string());
+        let confidence = std::cell::Cell::new(None);
         let resolve = |written: &str| -> Option<(String, &'static str)> {
             let lower = written.to_lowercase();
             self.arpabet(&lower)
@@ -353,7 +393,8 @@ impl English {
                 .or_else(|| {
                     // A full diphthong the model left unstressed (phytotaxa's
                     // AY0) reads reduced; give it secondary stress.
-                    model.guess(&lower).map(|p| {
+                    model.guess_scored(&lower).map(|(p, score)| {
+                        confidence.set(Some(score));
                         let p: Vec<String> = p
                             .into_iter()
                             .map(|ph| match ph.as_str() {
@@ -416,6 +457,7 @@ impl English {
                 word: original,
                 arpabet,
                 method,
+                confidence: confidence.get(),
             });
         }
         Some(spoken)
@@ -589,6 +631,60 @@ const SHOUTED_WORDS: &[&str] = &[
     "WON", "OWN", "USE", "ASK", "ART", "APP", "JOB", "MAP", "TIP", "YET", "NOR", "BUT",
 ];
 
+/// NeMo writes the British "one hundred and eight"; American narration, as
+/// the Kokoro US voices speak, says "one hundred eight" — and the "and" blurs
+/// where one number ends ("112 to 108" heard as "112 to 100 in 8").
+fn american_numbers(text: &str) -> String {
+    const NUMBER_WORDS: &[&str] = &[
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+        "twenty",
+        "thirty",
+        "forty",
+        "fifty",
+        "sixty",
+        "seventy",
+        "eighty",
+        "ninety",
+    ];
+    let words: Vec<&str> = text.split(' ').collect();
+    let mut out = Vec::with_capacity(words.len());
+    for (i, word) in words.iter().enumerate() {
+        let drop = *word == "and"
+            && i > 0
+            && matches!(words[i - 1], "hundred" | "thousand")
+            && words.get(i + 1).is_some_and(|next| {
+                let core = next.trim_end_matches(|c: char| !c.is_ascii_alphabetic());
+                NUMBER_WORDS.contains(&core)
+                    || core
+                        .split('-')
+                        .next()
+                        .is_some_and(|w| NUMBER_WORDS.contains(&w))
+            });
+        if !drop {
+            out.push(*word);
+        }
+    }
+    out.join(" ")
+}
+
 /// Domain endings read as words even when NeMo capitalizes them (dot APP).
 const WORD_DOMAINS: &[&str] = &[
     "com", "net", "org", "app", "dev", "edu", "gov", "info", "biz", "shop", "store", "blog",
@@ -760,6 +856,7 @@ mod tests {
             guesses: Default::default(),
             source: Default::default(),
             arpabet: HashMap::new(),
+            narration: HashMap::new(),
         };
         assert_eq!(frontend.phonemize("test!").unwrap(), "ˈA I O W Y!");
         assert_eq!(frontend.phonemize_ipa("test!").unwrap(), "ˈeɪ aɪ oʊ aʊ ɔɪ!");
@@ -774,6 +871,7 @@ mod tests {
             guesses: Default::default(),
             source: Default::default(),
             arpabet: HashMap::new(),
+            narration: HashMap::new(),
         };
         assert_eq!(frontend.phonemize("Hello!").unwrap(), "həlˈoʊ!");
         assert!(frontend.phonemize("unknown").is_err());
@@ -788,6 +886,7 @@ mod tests {
             guesses: Default::default(),
             source: Default::default(),
             arpabet: HashMap::new(),
+            narration: HashMap::new(),
         };
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("lexicon.dict");
@@ -900,5 +999,39 @@ mod tests {
             .find(|g| g.word == "nor'easter")
             .unwrap();
         assert_eq!(guess.arpabet, "N AO1 R IY1 S T ER0");
+    }
+    #[test]
+    fn american_numbers_drop_the_british_and() {
+        assert_eq!(
+            american_numbers("won one hundred and twelve to one hundred and eight, and more"),
+            "won one hundred twelve to one hundred eight, and more"
+        );
+        assert_eq!(
+            american_numbers("a hundred and fifty-five"),
+            "a hundred fifty-five"
+        );
+        assert_eq!(
+            american_numbers("one hundred and counting"),
+            "one hundred and counting"
+        );
+    }
+    #[test]
+    fn the_narration_lexicon_corrects_old_dictionary_readings() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cmudict.dict");
+        std::fs::write(&path, "meta M IY1 T AH0\nnorte N AO1 R T\n").unwrap();
+        let mut frontend = English::load(&path).unwrap();
+        // Strict mode keeps the dictionary's (old) readings.
+        assert_eq!(frontend.phonemize("Meta").unwrap(), "mˈitə");
+        frontend.set_fallback(true).unwrap();
+        assert_eq!(
+            frontend.phonemize_american("Meta, Norte").unwrap(),
+            "mˈɛtə, nˈɔɹtA"
+        );
+        // A project's own lexicon still wins.
+        let lexicon = dir.path().join("project.dict");
+        std::fs::write(&lexicon, "META  M IY1 T AH0\n").unwrap();
+        frontend.add_lexicon(&lexicon).unwrap();
+        assert_eq!(frontend.phonemize("Meta").unwrap(), "mˈitə");
     }
 }

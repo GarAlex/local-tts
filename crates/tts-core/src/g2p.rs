@@ -159,6 +159,12 @@ impl G2p {
     /// ARPAbet phones with stress digits for a lowercase word of letters and
     /// apostrophes, or None for a word the model cannot read.
     pub fn guess(&self, word: &str) -> Option<Vec<String>> {
+        self.guess_scored(word).map(|(phones, _)| phones)
+    }
+
+    /// [`Self::guess`] with the model's confidence: the mean log-probability
+    /// of the phones it chose (0 is certain; lower is less sure).
+    pub fn guess_scored(&self, word: &str) -> Option<(Vec<String>, f32)> {
         let ids: Vec<usize> = word
             .chars()
             .map(|c| self.letters.iter().position(|l| *l == c).map(|i| i + 1))
@@ -167,8 +173,8 @@ impl G2p {
             return None;
         }
         let (states, hidden) = self.encode(&ids);
-        let picked = if self.beam > 1 {
-            self.beam_search(&states, hidden)
+        let (picked, confidence) = if self.beam > 1 {
+            (self.beam_search(&states, hidden), 0.0)
         } else {
             self.greedy(&states, hidden)
         };
@@ -177,7 +183,7 @@ impl G2p {
             .filter(|&i| i >= 2)
             .map(|i| self.phones[i - 2].clone())
             .collect();
-        (!out.is_empty()).then_some(out)
+        (!out.is_empty()).then_some((out, confidence))
     }
 
     fn embed(&self, table: &[f32], id: usize) -> Vec<f32> {
@@ -251,10 +257,11 @@ impl G2p {
         (logits, hidden, context)
     }
 
-    fn greedy(&self, states: &[Vec<f32>], mut hidden: Vec<f32>) -> Vec<usize> {
+    fn greedy(&self, states: &[Vec<f32>], mut hidden: Vec<f32>) -> (Vec<usize>, f32) {
         let mut context = vec![0.0; self.dec];
         let mut prev = 1usize;
         let mut out = Vec::new();
+        let mut logp = Vec::new();
         for _ in 0..self.max_phones {
             let (logits, h, c) = self.step(prev, &hidden, &context, states);
             (hidden, context) = (h, c);
@@ -264,12 +271,16 @@ impl G2p {
                 .max_by(|a, b| a.1.total_cmp(b.1))
                 .map(|(i, _)| i)
                 .unwrap_or(1);
+            let top = logits[prev];
+            let lse = top + logits.iter().map(|x| (x - top).exp()).sum::<f32>().ln();
+            logp.push(logits[prev] - lse);
             if prev == 1 {
                 break;
             }
             out.push(prev);
         }
-        out
+        let confidence = logp.iter().sum::<f32>() / logp.len().max(1) as f32;
+        (out, confidence)
     }
 
     /// The trainer's beam search, step for step: total log-probability, no

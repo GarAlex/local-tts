@@ -1,0 +1,9 @@
+;;; Pronunciations narration mode uses over the CMU dictionary: names and
+;;; brands CMUdict lacks or records with an older reading. CMU format,
+;;; ARPAbet with stress. A project's own pronunciations.dict wins over these.
+;;; Checked by ear and with Whisper; see english::tests::the_narration_lexicon_*.
+META  M EH1 T AH0
+NORTE  N AO1 R T EY0
+KOBEISSI  K OW0 B EY1 S IY0
+CANVA  K AE1 N V AH0
+KUBERNETES  K UW2 B ER0 N EH1 T IY0 Z

@@ -332,14 +332,20 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 "speaker": speaker,
                 "guessed": guesses.iter().map(|g| serde_json::json!({
                     "word": g.word, "arpabet": g.arpabet, "method": g.method,
+                    "confidence": g.confidence, "unsure": g.unsure(),
                 })).collect::<Vec<_>>(),
             })
         );
     }
     for guess in &guesses {
         // Lexicon-ready: paste the line into --lexicon to keep or correct it.
+        let unsure = if guess.unsure() {
+            ", unsure: check by ear"
+        } else {
+            ""
+        };
         eprintln!(
-            "guessed ({}): {}  {}",
+            "guessed ({}{unsure}): {}  {}",
             guess.method,
             guess.word.to_uppercase(),
             guess.arpabet
