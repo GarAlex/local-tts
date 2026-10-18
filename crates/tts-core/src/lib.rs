@@ -1,5 +1,7 @@
 //! Offline synthesis, voice training contracts and dataset authoring.
 
+#[cfg(feature = "download")]
+pub mod catalog;
 pub mod chatterbox;
 pub mod clips;
 pub mod collection;

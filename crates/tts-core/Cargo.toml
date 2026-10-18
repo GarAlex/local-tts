@@ -17,6 +17,12 @@ tempfile = "3"
 unicode-normalization = "0.1"
 tokenizers = { version = "0.22", default-features = false, features = ["fancy-regex"] }
 rand = "0.9"
+ureq = { version = "2", optional = true }
+zip = { version = "2", default-features = false, optional = true }
+
+[features]
+# Native installer for the pinned voice packages (`catalog`): HTTPS via ureq.
+download = ["dep:ureq", "dep:zip"]
 
 [build-dependencies]
 cc = "1.5.1"

@@ -19,6 +19,8 @@ const LEXICON_BACKENDS: [&str; 4] = ["kokoro", "inflect", "kitten", "vits"];
 const HELP: &str = "tts-speak — offline text to WAV, using local-tts-core
 Usage: tts-speak --model FOLDER --output FILE.wav [options]
        tts-speak --list-voices [--backend NAME] [--model FOLDER]
+       tts-speak --catalog [--voices-dir DIR]
+       tts-speak --install ID | --remove ID  --voices-dir DIR [--mirror URL]
   --backend kokoro|vosk|piper|vits|chatterbox|qwen-design|inflect|kitten|math|math-neural  (default kokoro)
   --language en|ru|uk|de|fr|es|it|pt|pl|nl              (default en)
   --text TEXT | --input UTF8_FILE                      (default: stdin)
@@ -30,6 +32,9 @@ Usage: tts-speak --model FOLDER --output FILE.wav [options]
   --json                                              print a JSON result on stdout
   --list-voices                                       print the backend's speakers/languages as JSON
                                                       (--model required for piper and vits)
+  --catalog                                           print installable voice packages as JSON
+  --install ID / --remove ID                          download+verify / delete a package in --voices-dir
+  --mirror URL                                        try URL/ID/FILE before the pinned upstream URL
   --force                                             replace an existing output
   --help | --version
 Models must already be installed. No downloads, GUI, training, or Python runtime.";
@@ -57,7 +62,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
     let mut flags = std::collections::BTreeSet::new();
     let mut iter = args.into_iter();
     while let Some(key) = iter.next() {
-        if ["--force", "--json", "--list-voices"].contains(&key.as_str()) {
+        if ["--force", "--json", "--list-voices", "--catalog"].contains(&key.as_str()) {
             if !flags.insert(key.clone()) {
                 return Err(format!("duplicate {key}"));
             }
@@ -76,6 +81,10 @@ fn run(args: Vec<String>) -> Result<(), String> {
             "--profile",
             "--description",
             "--lexicon",
+            "--install",
+            "--remove",
+            "--voices-dir",
+            "--mirror",
         ]
         .contains(&key.as_str())
         {
@@ -96,6 +105,29 @@ fn run(args: Vec<String>) -> Result<(), String> {
     let backend = get("--backend").unwrap_or("kokoro");
     if !BACKENDS.contains(&backend) {
         return Err("unknown backend".into());
+    }
+    let package_options = ["--install", "--remove", "--voices-dir", "--mirror"];
+    if flags.contains("--catalog") || get("--install").is_some() || get("--remove").is_some() {
+        if let Some(key) = opts.keys().find(|k| !package_options.contains(&k.as_str())) {
+            return Err(format!("package commands do not accept {key}"));
+        }
+        if flags.len() > 1
+            || (flags.contains("--catalog") as usize
+                + opts.contains_key("--install") as usize
+                + opts.contains_key("--remove") as usize)
+                != 1
+        {
+            return Err("choose one of --catalog, --install or --remove".into());
+        }
+        return packages(
+            get("--install"),
+            get("--remove"),
+            get("--voices-dir"),
+            get("--mirror"),
+        );
+    }
+    if let Some(key) = opts.keys().find(|k| package_options.contains(&k.as_str())) {
+        return Err(format!("{key} requires --install or --remove"));
     }
     if flags.contains("--list-voices") {
         if let Some(key) = opts
@@ -286,6 +318,64 @@ fn default_speaker(backend: &str) -> &'static str {
         "piper" => "lada",
         _ => "default",
     }
+}
+/// `--catalog`, `--install` and `--remove`: the pinned voice packages.
+fn packages(
+    install: Option<&str>,
+    remove: Option<&str>,
+    voices_dir: Option<&str>,
+    mirror: Option<&str>,
+) -> Result<(), String> {
+    use local_tts_core::catalog;
+    let dir = voices_dir.map(Path::new);
+    if let Some(id) = install {
+        let dir = dir.ok_or("--install requires --voices-dir")?;
+        let mut shown = 0;
+        let path = catalog::install(
+            id,
+            dir,
+            mirror,
+            &mut |done, total| {
+                let percent = (done * 100).checked_div(total).unwrap_or(0).min(100);
+                if percent >= shown + 10 || done == total {
+                    shown = percent;
+                    eprintln!("{id}: {percent}% of {:.1} MB", total as f64 / 1e6);
+                }
+            },
+            &AtomicBool::new(false),
+        )?;
+        println!(
+            "{}",
+            serde_json::json!({ "installed": id, "path": path.display().to_string() })
+        );
+        return Ok(());
+    }
+    if let Some(id) = remove {
+        let removed = catalog::remove(id, dir.ok_or("--remove requires --voices-dir")?)?;
+        println!("{}", serde_json::json!({ "removed": removed, "id": id }));
+        return Ok(());
+    }
+    if mirror.is_some() {
+        return Err("--mirror requires --install".into());
+    }
+    let installed = dir.map(catalog::installed).unwrap_or_default();
+    let listing: Vec<_> = catalog::catalog()
+        .iter()
+        .map(|p| {
+            serde_json::json!({
+                "id": p.id,
+                "title": p.title,
+                "backend": p.backend,
+                "languages": p.languages,
+                "license": p.license,
+                "source": p.source,
+                "downloadBytes": p.download_bytes(),
+                "installed": installed.contains(&p.id),
+            })
+        })
+        .collect();
+    println!("{}", serde_json::Value::Array(listing));
+    Ok(())
 }
 fn vits_manifest(model: &Path) -> Result<local_tts_core::voice::VoiceManifest, String> {
     let path = model.join("voice.json");

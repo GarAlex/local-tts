@@ -71,3 +71,28 @@ synthesizing. Piper and VITS read their package, so they need `--model`; the
 other backends answer without one. Exported VITS voices default to their first
 speaker.
 
+## Voice packages
+
+`tts-speak` can install the pinned voice packages itself — no Python, no
+scripts. Each file is fetched from its pinned upstream URL (Hugging Face or
+GitHub at a fixed commit), checked against its SHA-256, and the package folder
+appears only once everything verifies; a failed or interrupted download leaves
+nothing behind.
+
+```sh
+tts-speak --catalog --voices-dir ~/voices          # JSON: id, backend, size, license, installed
+tts-speak --install kokoro-en-q8 --voices-dir ~/voices
+tts-speak --backend kokoro --model ~/voices/kokoro-en-q8 --output hi.wav --text 'Hello.'
+tts-speak --remove kokoro-en-q8 --voices-dir ~/voices
+```
+
+| Package | Backend | Download | Voices |
+|---|---|---|---|
+| `kokoro-en-q8` | kokoro | 92 MB | af_heart |
+| `kitten-nano-en` | kitten | 31 MB | 8 (Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, Leo) |
+| `inflect-nano-en` | inflect | 20 MB | 1 |
+
+`--mirror URL` tries `URL/<id>/<file>` first and falls back to the pinned URL;
+the checksum decides either way. Library users enable the `download` feature
+of `local-tts-core` and call `catalog::install`.
+

@@ -11,6 +11,6 @@ name = "tts-speak"
 path = "src/main.rs"
 
 [dependencies]
-local-tts-core = { path = "../tts-core" }
+local-tts-core = { path = "../tts-core", features = ["download"] }
 serde_json.workspace = true
 tempfile = "3"
