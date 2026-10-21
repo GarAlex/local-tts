@@ -112,3 +112,35 @@ an agent drops into a project's `Resources/` as an ordinary audio resource:
 ```sh
 tts-speak --model voices/kokoro-en-q8 --lexicon brand.dict --json --output "Demo.promo/Resources/vo-1.wav" --text 'Meet PromoShot.'
 ```
+
+## Word timing (0.7.0)
+
+`TimedSynthesizer::synthesize_timed` answers the same audio as
+`Synthesizer::synthesize` plus each spoken word's start and end, read from
+the model's own duration predictor — no aligner, no extra model run.
+PromoShot maps these words onto the script (its docs/SPEECH-SYNC.md §3).
+
+- **Words are the engine's**, normalized: "$49.99" comes back as "forty",
+  "nine", "dollars", "ninety", "nine", "cents". `English::
+  phonemize_american_spans` / `phonemize_ipa_current_spans` give the phoneme
+  string (unchanged) and each word's byte range in it;
+  `paragraph::chunks_with_offsets` gives each chunk's place in that string.
+- **Kokoro (F32, Q8, Q4):** the encoder's per-token durations
+  (`/encoder/Clip_output_0`) are exposed as an extra output by patching the
+  pinned model's bytes in memory after the checksum
+  (`onnx_output::expose`); the file and its pin are unchanged, so no package
+  is reinstalled. The patched session's audio is bit-identical to the
+  file's own on all three exports (`timed_audio_equals_untimed_audio`). One
+  frame is 600 samples at 24 kHz (25 ms), measured per chunk as samples over
+  frames.
+- **Kitten:** its existing `duration` output (int64 per token); also 600
+  samples a frame, the 5000-sample tail trim respected. Kitten's waveform
+  draws noise, so two calls differ sample by sample (as before); the
+  length and the words are the same every time.
+- **Inflect** answers "timing not supported for Inflect": its durations are
+  only exposed already expanded.
+- Chunks join as `paragraph::append` joins them, 120 ms apart; a word's time
+  is integer frames times one constant, the same on every machine.
+
+The model tests are ignored without installed packages:
+`cargo test --release -p local-tts-core --test timing -- --ignored`.

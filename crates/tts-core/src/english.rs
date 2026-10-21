@@ -179,22 +179,45 @@ impl English {
         self.ipa(text, true)
     }
     fn ipa(&self, text: &str, current: bool) -> Result<String, String> {
-        Ok(self
-            .phonemize_impl(text, current, false)?
-            .chars()
-            .map(|c| match c {
-                'A' => "eɪ".into(),
-                'I' => "aɪ".into(),
-                'O' => "oʊ".into(),
-                'W' => "aʊ".into(),
-                'Y' => "ɔɪ".into(),
-                _ => c.to_string(),
+        Ok(self.ipa_spans(text, current)?.0)
+    }
+    /// [`Self::phonemize_ipa_current`] and where each spoken word's phones
+    /// are in it (byte ranges), for timing.
+    pub fn phonemize_ipa_current_spans(
+        &self,
+        text: &str,
+    ) -> Result<(String, Vec<PhonemeWord>), String> {
+        self.ipa_spans(text, true)
+    }
+    fn ipa_spans(&self, text: &str, current: bool) -> Result<(String, Vec<PhonemeWord>), String> {
+        let (phones, words) = self.phonemize_impl(text, current, false)?;
+        // The vowel shortcuts expand one char to two: map every byte offset.
+        let mut out = String::with_capacity(phones.len() * 2);
+        let mut at = vec![0usize; phones.len() + 1];
+        for (offset, c) in phones.char_indices() {
+            at[offset] = out.len();
+            match c {
+                'A' => out.push_str("eɪ"),
+                'I' => out.push_str("aɪ"),
+                'O' => out.push_str("oʊ"),
+                'W' => out.push_str("aʊ"),
+                'Y' => out.push_str("ɔɪ"),
+                _ => out.push(c),
+            }
+        }
+        at[phones.len()] = out.len();
+        let words = words
+            .into_iter()
+            .map(|w| PhonemeWord {
+                range: at[w.range.start]..at[w.range.end],
+                spoken: w.spoken,
             })
-            .collect())
+            .collect();
+        Ok((out, words))
     }
 
     pub fn phonemize(&self, text: &str) -> Result<String, String> {
-        self.phonemize_impl(text, true, false)
+        Ok(self.phonemize_impl(text, true, false)?.0)
     }
     /// [`Self::phonemize`] with American connected-speech cues for Kokoro's
     /// US voices: function words lose their citation stress and an
@@ -203,9 +226,22 @@ impl English {
     /// word is stressed and every t is hard, which sounds foreign. User
     /// lexicon entries are used exactly as written.
     pub fn phonemize_american(&self, text: &str) -> Result<String, String> {
+        Ok(self.phonemize_impl(text, true, true)?.0)
+    }
+    /// [`Self::phonemize_american`] and where each spoken word's phones are
+    /// in it (byte ranges), for timing. The phones are the same string.
+    pub fn phonemize_american_spans(
+        &self,
+        text: &str,
+    ) -> Result<(String, Vec<PhonemeWord>), String> {
         self.phonemize_impl(text, true, true)
     }
-    fn phonemize_impl(&self, text: &str, current: bool, american: bool) -> Result<String, String> {
+    fn phonemize_impl(
+        &self,
+        text: &str,
+        current: bool,
+        american: bool,
+    ) -> Result<(String, Vec<PhonemeWord>), String> {
         // Narration mode (the fallback on): NeMo's English grammars read the
         // money, dates, times, measures, URLs… that strict text-v1 refuses.
         let narration = current && self.fallback.is_some();
@@ -266,6 +302,7 @@ impl English {
         let mut index = 0;
         let mut out = String::new();
         let mut word = String::new();
+        let mut spans: Vec<PhonemeWord> = Vec::new();
         let mut flush = |word: &mut String, out: &mut String| -> Result<(), String> {
             if !word.is_empty() {
                 let spelled = if self.overrides.contains_key(&word.to_lowercase()) {
@@ -325,6 +362,10 @@ impl English {
                     let spoken = out.split_off(start);
                     out.push_str(&connected_us(&word.to_lowercase(), &spoken));
                 }
+                spans.push(PhonemeWord {
+                    spoken: word.to_lowercase(),
+                    range: start..out.len(),
+                });
                 index += 1;
                 word.clear();
             }
@@ -358,11 +399,20 @@ impl English {
             }
         }
         flush(&mut word, &mut out)?;
+        let lead = out.len() - out.trim_start().len();
         let out = out.trim().to_string();
         if out.is_empty() {
             return Err("enter some text".into());
         }
-        Ok(out)
+        let spans = spans
+            .into_iter()
+            .filter(|w| !w.range.is_empty())
+            .map(|w| PhonemeWord {
+                range: (w.range.start - lead).min(out.len())..(w.range.end - lead).min(out.len()),
+                spoken: w.spoken,
+            })
+            .collect();
+        Ok((out, spans))
     }
     /// The fallback's pronunciation for an unknown `word` (lowercase, as
     /// normalized), recorded as a [`Guess`]; None when the fallback is off.
@@ -588,6 +638,15 @@ const FUNCTION_WORDS: &[&str] = &[
     "she", "her", "it", "its", "it's", "they", "them", "their", "i'm", "you're", "we're",
     "they're", "he's", "she's", "i'll", "you'll", "we'll", "i've", "you've", "we've",
 ];
+
+/// One spoken word of a text and where its phones are in the phoneme string
+/// (a byte range): the word as the engine reads it — normalized ("forty",
+/// "nine", "dollars"), not the caller's spelling.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PhonemeWord {
+    pub spoken: String,
+    pub range: std::ops::Range<usize>,
+}
 
 /// One word's Kokoro phonemes with American connected-speech cues.
 fn connected_us(word: &str, spoken: &str) -> String {

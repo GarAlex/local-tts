@@ -1,4 +1,6 @@
-use crate::{Audio, Language, SynthesisRequest, Synthesizer, english::English};
+use crate::{
+    Audio, Language, SynthesisRequest, Synthesizer, TimedAudio, TimedSynthesizer, english::English,
+};
 use ndarray::Array2;
 use ort::{session::Session, value::Tensor};
 use std::{collections::HashMap, path::Path};
@@ -52,6 +54,16 @@ impl Variant {
             .ok_or_else(|| "checksum mismatch for model.onnx; unsupported Kokoro variant".into())
     }
 }
+
+/// The encoder's per-token durations (frames, after Round and Clip ≥ 1),
+/// before they are expanded: the same name in the F32, Q8 and Q4 exports.
+pub const DURATIONS_TENSOR: &str = "/encoder/Clip_output_0";
+
+/// Samples per predicted duration unit at 24 kHz: hexgrad's pipeline
+/// doubles the predictor's durations and the decoder upsamples by 300.
+/// Pinned by the `durations_sum_to_samples` test, not assumed: timing uses
+/// the exact ratio of each chunk's samples to its frames.
+pub const SAMPLES_PER_FRAME: f64 = 600.0;
 
 /// The voice every Kokoro package has; the others are optional files.
 pub const DEFAULT_VOICE: &str = "af_heart";
@@ -114,6 +126,18 @@ pub struct Kokoro {
 
 impl Kokoro {
     pub fn load(root: &Path) -> Result<Self, Error> {
+        Self::load_with(root, true)
+    }
+
+    /// The model exactly as the file holds it, with no durations output —
+    /// the 0.6 session, for the test that holds the timed session's audio
+    /// to it. Timing fails on an engine loaded this way.
+    #[doc(hidden)]
+    pub fn load_unpatched(root: &Path) -> Result<Self, Error> {
+        Self::load_with(root, false)
+    }
+
+    fn load_with(root: &Path, patch: bool) -> Result<Self, Error> {
         let load = || -> Result<Self, Box<dyn std::error::Error>> {
             let assets: serde_json::Value =
                 serde_json::from_str(include_str!("../../../assets/english-assets.json"))?;
@@ -169,11 +193,26 @@ impl Kokoro {
                         .map_err(std::io::Error::other)?,
                 );
             }
+            // The pinned file's bytes, with the encoder's per-token
+            // durations exposed as an extra output — in memory only, after
+            // the checksum: the file and its pin never change.
+            let model = std::fs::read(root.join("model.onnx"))?;
+            let model = if patch {
+                crate::onnx_output::expose(
+                    &model,
+                    DURATIONS_TENSOR,
+                    "durations",
+                    crate::onnx_output::ElemType::Float,
+                )
+                .map_err(std::io::Error::other)?
+            } else {
+                model
+            };
             Ok(Self {
                 variant,
                 session: Session::builder()?
                     .with_intra_threads(2)?
-                    .commit_from_file(root.join("model.onnx"))?,
+                    .commit_from_memory(&model)?,
                 vocab,
                 styles,
                 frontend: English::load(&root.join("cmudict.dict"))
@@ -243,6 +282,18 @@ impl Kokoro {
         phonemes: &str,
         duration_scale: f32,
     ) -> Result<Audio, Error> {
+        self.synthesize_phonemes_timed_as(speaker, phonemes, duration_scale)
+            .map(|(audio, _)| audio)
+    }
+
+    /// [`Self::synthesize_phonemes_as`] and each token's duration in frames
+    /// — the padding tokens at both ends included — from the same run.
+    pub fn synthesize_phonemes_timed_as(
+        &mut self,
+        speaker: &str,
+        phonemes: &str,
+        duration_scale: f32,
+    ) -> Result<(Audio, Vec<i64>), Error> {
         if !duration_scale.is_finite() || !(0.5..=2.0).contains(&duration_scale) {
             return Err(Error("duration scale must be 0.5–2.0".into()));
         }
@@ -275,20 +326,31 @@ impl Kokoro {
         // container, for one) a run occasionally yields NaN samples that the
         // same input does not reproduce; another run of the same chunk recovers.
         const ATTEMPTS: usize = 3;
-        let mut run = || -> Result<Option<Audio>, Box<dyn std::error::Error>> {
+        type Run = Result<Option<(Audio, Vec<i64>)>, Box<dyn std::error::Error>>;
+        let mut run = || -> Run {
             let outputs = self.session.run(ort::inputs![
                 "input_ids" => Tensor::from_array(Array2::from_shape_vec((1, padded.len()), padded.clone())?)?,
                 "style" => Tensor::from_array(Array2::from_shape_vec((1, 256), style.clone())?)?,
                 "speed" => Tensor::from_array(([1usize], vec![1.0 / duration_scale]))?
             ])?;
-            let (_, samples) = outputs[0].try_extract_tensor::<f32>()?;
+            let (_, samples) = outputs["waveform"].try_extract_tensor::<f32>()?;
             if samples.is_empty() || samples.iter().any(|s| !s.is_finite()) {
                 return Ok(None);
             }
-            Ok(Some(Audio {
-                sample_rate: 24000,
-                samples: samples.to_vec(),
-            }))
+            let durations: Vec<f32> = match outputs.get("durations") {
+                Some(value) => value.try_extract_tensor::<f32>()?.1.to_vec(),
+                None => Vec::new(),
+            };
+            if durations.iter().any(|d| !d.is_finite()) {
+                return Ok(None);
+            }
+            Ok(Some((
+                Audio {
+                    sample_rate: 24000,
+                    samples: samples.to_vec(),
+                },
+                durations.iter().map(|d| d.round() as i64).collect(),
+            )))
         };
         for _ in 0..ATTEMPTS {
             if let Some(audio) = run().map_err(|e| Error(e.to_string()))? {
@@ -299,6 +361,85 @@ impl Kokoro {
             "model produced invalid audio {ATTEMPTS} times in a row for this chunk"
         )))
     }
+}
+
+impl TimedSynthesizer for Kokoro {
+    fn synthesize_timed(&mut self, request: &SynthesisRequest<'_>) -> Result<TimedAudio, Error> {
+        if request.language != Language::En {
+            return Err(Error("Kokoro packages support English only".into()));
+        }
+        if !self.styles.contains_key(request.speaker) {
+            return Err(self.unknown_speaker(request.speaker));
+        }
+        if request.text.chars().count() > 10000 {
+            return Err(Error("text exceeds 10000 characters".into()));
+        }
+        let (phonemes, spans) = self
+            .frontend
+            .phonemize_american_spans(request.text)
+            .map_err(Error)?;
+        let chunks = crate::paragraph::chunks_with_offsets(&phonemes, 510).map_err(Error)?;
+        let mut output: Option<Audio> = None;
+        let mut words: Vec<(usize, crate::SpokenWord)> = Vec::new();
+        let mut frame_seconds = SAMPLES_PER_FRAME / 24000.0;
+        for (chunk, offset) in &chunks {
+            let (audio, durations) =
+                self.synthesize_phonemes_timed_as(request.speaker, chunk, request.duration_scale)?;
+            let frames: i64 = durations.iter().map(|d| (*d).max(0)).sum();
+            if frames <= 0 {
+                return Err(Error(
+                    "this Kokoro session reports no durations (loaded unpatched)".into(),
+                ));
+            }
+            // Exact: the chunk's samples over its frames (600 on every export).
+            let unit = audio.samples.len() as f64 / frames as f64;
+            frame_seconds = unit / 24000.0;
+            let start_samples = output.as_ref().map_or(0, |a| {
+                a.samples.len() + crate::paragraph::gap_samples(a.sample_rate)
+            });
+            let in_chunk = chunk_tokens(chunk, *offset, &spans, 1);
+            words.extend(crate::words_from_durations(
+                &in_chunk,
+                &durations,
+                frame_seconds,
+                start_samples as f64 / 24000.0,
+                audio.samples.len() as f64 / 24000.0,
+            ));
+            crate::paragraph::append(&mut output, audio).map_err(Error)?;
+        }
+        Ok(TimedAudio {
+            audio: output.ok_or_else(|| Error("enter text".into()))?,
+            words: crate::merge_split_words(words),
+            frame_seconds,
+        })
+    }
+}
+
+/// The words of `spans` (byte ranges in the whole phoneme string) that fall
+/// in the chunk starting at byte `offset`, as token index ranges: the
+/// chunk's `k`th character is token `k + lead` (the leading pad tokens).
+pub(crate) fn chunk_tokens(
+    chunk: &str,
+    offset: usize,
+    spans: &[crate::english::PhonemeWord],
+    lead: usize,
+) -> Vec<(usize, String, std::ops::Range<usize>)> {
+    let end = offset + chunk.len();
+    let char_at = |byte: usize| chunk[..byte.min(chunk.len())].chars().count();
+    spans
+        .iter()
+        .enumerate()
+        .filter(|(_, w)| w.range.start < end && w.range.end > offset)
+        .map(|(index, w)| {
+            let a = w.range.start.max(offset) - offset;
+            let b = w.range.end.min(end) - offset;
+            (
+                index,
+                w.spoken.clone(),
+                char_at(a) + lead..char_at(b) + lead,
+            )
+        })
+        .collect()
 }
 
 impl Synthesizer for Kokoro {

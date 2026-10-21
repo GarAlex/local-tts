@@ -26,6 +26,7 @@ pub mod math_sequence;
 pub mod math_speech;
 pub mod nemo;
 pub mod neon;
+pub mod onnx_output;
 pub mod paragraph;
 pub mod piper;
 pub mod piper_training;
@@ -127,4 +128,82 @@ pub fn read_wav(path: &std::path::Path) -> Result<Audio, Box<dyn std::error::Err
 pub trait Synthesizer {
     type Error: std::error::Error + Send + Sync + 'static;
     fn synthesize(&mut self, request: &SynthesisRequest<'_>) -> Result<Audio, Self::Error>;
+}
+
+/// One spoken word of the text as the engine read it — normalized words
+/// ("forty", "nine", "dollars"), not the caller's spelling — and when it
+/// is said, in seconds from the start of the audio.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SpokenWord {
+    pub text: String,
+    pub start: f64,
+    pub end: f64,
+}
+
+/// Audio and the words in it, from the model's own duration predictor.
+#[derive(Debug, Clone)]
+pub struct TimedAudio {
+    /// The same samples [`Synthesizer::synthesize`] returns for the request.
+    pub audio: Audio,
+    pub words: Vec<SpokenWord>,
+    /// Seconds per duration unit the model predicted in.
+    pub frame_seconds: f64,
+}
+
+/// A backend that can say when each word is spoken. Additive: requests
+/// and [`Synthesizer`] are unchanged.
+pub trait TimedSynthesizer: Synthesizer {
+    fn synthesize_timed(
+        &mut self,
+        request: &SynthesisRequest<'_>,
+    ) -> Result<TimedAudio, Self::Error>;
+}
+
+/// Word times from per-token durations: a word spans the frames of its
+/// first to its last token. `words` are (word index, spoken text, token
+/// range — first inclusive, end exclusive); integer frames times one
+/// constant, offset by the chunk's start and held inside its audio.
+pub(crate) fn words_from_durations(
+    words: &[(usize, String, std::ops::Range<usize>)],
+    durations: &[i64],
+    frame_seconds: f64,
+    offset_seconds: f64,
+    limit_seconds: f64,
+) -> Vec<(usize, SpokenWord)> {
+    let mut cumulative = Vec::with_capacity(durations.len() + 1);
+    let mut total = 0i64;
+    cumulative.push(0i64);
+    for d in durations {
+        total += (*d).max(0);
+        cumulative.push(total);
+    }
+    let at = |frames: i64| offset_seconds + (frames as f64 * frame_seconds).min(limit_seconds);
+    words
+        .iter()
+        .filter(|(_, _, r)| r.start < r.end && r.end <= durations.len())
+        .map(|(index, text, r)| {
+            (
+                *index,
+                SpokenWord {
+                    text: text.clone(),
+                    start: at(cumulative[r.start]),
+                    end: at(cumulative[r.end]),
+                },
+            )
+        })
+        .collect()
+}
+
+/// One word per spoken word: a word whose phones two chunks split (a
+/// spelled acronym's letters may be) runs from its first start to its last
+/// end.
+pub(crate) fn merge_split_words(words: Vec<(usize, SpokenWord)>) -> Vec<SpokenWord> {
+    let mut out: Vec<(usize, SpokenWord)> = Vec::with_capacity(words.len());
+    for (index, word) in words {
+        match out.last_mut() {
+            Some((last, previous)) if *last == index => previous.end = word.end,
+            _ => out.push((index, word)),
+        }
+    }
+    out.into_iter().map(|(_, w)| w).collect()
 }

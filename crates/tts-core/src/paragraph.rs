@@ -14,14 +14,24 @@ pub fn check_cancel(cancel: &AtomicBool) -> Result<(), String> {
 /// Split at sentence punctuation when possible, otherwise at whitespace.
 /// A word exceeding the model limit fails instead of being truncated.
 pub fn chunks(text: &str, limit: usize) -> Result<Vec<String>, String> {
+    Ok(chunks_with_offsets(text, limit)?
+        .into_iter()
+        .map(|(chunk, _)| chunk)
+        .collect())
+}
+
+/// [`chunks`], each with the byte offset in `text` where it starts (after
+/// its trim), so a position in the text can be found in its chunk.
+pub fn chunks_with_offsets(text: &str, limit: usize) -> Result<Vec<(String, usize)>, String> {
     if limit == 0 || text.trim().is_empty() || text.chars().count() > 10000 {
         return Err("enter 1–10000 characters within the model's chunk limit".into());
     }
     let mut remaining = text.trim();
+    let mut base = text.len() - text.trim_start().len();
     let mut result = Vec::new();
     while !remaining.is_empty() {
         if remaining.chars().count() <= limit {
-            result.push(remaining.into());
+            result.push((remaining.into(), base));
             break;
         }
         let mut sentence = None;
@@ -47,10 +57,20 @@ pub fn chunks(text: &str, limit: usize) -> Result<Vec<String>, String> {
             .or(space)
             .filter(|n| *n > 0)
             .ok_or("a word exceeds the model chunk limit")?;
-        result.push(remaining[..split].trim().into());
-        remaining = remaining[split..].trim_start();
+        let piece = &remaining[..split];
+        let lead = piece.len() - piece.trim_start().len();
+        result.push((piece.trim().into(), base + lead));
+        let rest = &remaining[split..];
+        let skipped = rest.len() - rest.trim_start().len();
+        base += split + skipped;
+        remaining = rest.trim_start();
     }
     Ok(result)
+}
+
+/// The silence [`append`] puts between chunks, in samples at `sample_rate`.
+pub fn gap_samples(sample_rate: u32) -> usize {
+    sample_rate as usize * 120 / 1000
 }
 
 /// Join with 120 ms silence; reject incompatible or excessive model output.
@@ -61,9 +81,9 @@ pub fn append(output: &mut Option<Audio>, audio: Audio) -> Result<(), String> {
     {
         return Err("invalid chunk audio".into());
     }
-    let total = output.as_ref().map_or(0, |a| {
-        a.samples.len() + audio.sample_rate as usize * 120 / 1000
-    });
+    let total = output
+        .as_ref()
+        .map_or(0, |a| a.samples.len() + gap_samples(audio.sample_rate));
     if total + audio.samples.len() > audio.sample_rate as usize * 600 {
         return Err("paragraph audio exceeds ten minutes".into());
     }
@@ -97,6 +117,27 @@ mod tests {
         assert!(chunks("toolongword", 4).is_err());
         assert!(chunks(" ", 4).is_err());
         assert!(chunks(&"a".repeat(10001), 510).is_err());
+    }
+    #[test]
+    fn chunk_offsets_join_like_append() {
+        for (text, limit) in [
+            ("  Привіт світе! Це українська мова. Ще один рядок.  ", 24),
+            ("hello world again", 11),
+            ("one.  two three   four five six", 9),
+            ("single", 100),
+        ] {
+            let parts = chunks_with_offsets(text, limit).unwrap();
+            assert_eq!(
+                parts.iter().map(|p| p.0.clone()).collect::<Vec<_>>(),
+                chunks(text, limit).unwrap()
+            );
+            // Each offset is where its chunk stands in the text.
+            for (chunk, offset) in &parts {
+                assert_eq!(&text[*offset..*offset + chunk.len()], chunk, "{text:?}");
+            }
+            assert!(parts.windows(2).all(|w| w[0].1 + w[0].0.len() <= w[1].1));
+        }
+        assert_eq!(gap_samples(24000), 2880);
     }
     #[test]
     fn joining_adds_silence_and_checks_audio() {

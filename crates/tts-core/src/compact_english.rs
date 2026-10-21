@@ -1,6 +1,9 @@
 //! Experimental compact English ONNX backends with native BSD CMU frontend.
 //! Vocabulary data follows publisher inventories; notices accompany model assets.
-use crate::{Audio, Language, SynthesisRequest, Synthesizer, english::English, kokoro::Error};
+use crate::{
+    Audio, Language, SpokenWord, SynthesisRequest, Synthesizer, TimedAudio, TimedSynthesizer,
+    english::English, kokoro::Error,
+};
 use ndarray::{Array2, ArrayD, arr0};
 use ort::{session::Session, value::Tensor};
 use rand::{Rng, SeedableRng};
@@ -131,7 +134,21 @@ impl CompactEnglish {
         request: &SynthesisRequest<'_>,
         cancel: &AtomicBool,
     ) -> Result<Audio, Error> {
-        let run = || -> Result<Audio, Box<dyn std::error::Error>> {
+        self.run(request, cancel, false).map(|(audio, _, _)| audio)
+    }
+
+    /// The synthesis; with `timed`, also each spoken word's time from the
+    /// model's per-token durations (Kitten only) and the seconds per unit.
+    fn run(
+        &mut self,
+        request: &SynthesisRequest<'_>,
+        cancel: &AtomicBool,
+        timed: bool,
+    ) -> Result<(Audio, Vec<SpokenWord>, f64), Error> {
+        if timed && self.kind == CompactKind::Inflect {
+            return Err(Error("timing not supported for Inflect".into()));
+        }
+        let run = || -> Result<(Audio, Vec<SpokenWord>, f64), Box<dyn std::error::Error>> {
             if request.language != Language::En {
                 return Err("compact models support English only".into());
             }
@@ -156,20 +173,24 @@ impl CompactEnglish {
             if self.kind == CompactKind::Kitten && !self.styles.contains_key(speaker) {
                 return Err("unknown Kitten voice".into());
             }
-            let mut joined = None;
+            let mut joined: Option<Audio> = None;
+            let mut words: Vec<(usize, SpokenWord)> = Vec::new();
+            let mut frame_seconds = 0.0;
             // Resolve numeric forms and contextual readings over the entire passage.
             // Splitting raw text can detach units or abbreviations from their numbers.
-            let prepared = self
+            let (prepared, spans) = self
                 .dictionary
-                .phonemize_ipa_current(request.text)
+                .phonemize_ipa_current_spans(request.text)
                 .map_err(std::io::Error::other)?;
-            for chunk in crate::paragraph::chunks(&prepared, 240).map_err(std::io::Error::other)? {
+            for (chunk, offset) in crate::paragraph::chunks_with_offsets(&prepared, 240)
+                .map_err(std::io::Error::other)?
+            {
                 crate::paragraph::check_cancel(cancel).map_err(std::io::Error::other)?;
                 let phones = chunk.clone();
-                let phones = if self.kind == CompactKind::Kitten {
-                    kitten_spacing(&phones)
+                let (phones, sources) = if self.kind == CompactKind::Kitten {
+                    kitten_spacing_mapped(&phones)
                 } else {
-                    phones
+                    (phones, Vec::new())
                 };
                 let ids: Vec<i64> = phones
                     .chars()
@@ -224,7 +245,43 @@ impl CompactEnglish {
                         0.8
                     };
                     let out=self.first.run(ort::inputs!["input_ids"=>Tensor::from_array(Array2::from_shape_vec((1,len),tokens)?)?,"style"=>Tensor::from_array(Array2::from_shape_vec((1,256),style)?)?,"speed"=>Tensor::from_array(([1],vec![prior/request.duration_scale]))?])?;
-                    let mut samples = out[0].try_extract_tensor::<f32>()?.1.to_vec();
+                    let mut samples = out["waveform"].try_extract_tensor::<f32>()?.1.to_vec();
+                    if timed {
+                        // `duration`: frames per input token, the pads included.
+                        let durations = out["duration"].try_extract_tensor::<i64>()?.1.to_vec();
+                        let frames: i64 = durations.iter().map(|d| (*d).max(0)).sum();
+                        if frames <= 0 {
+                            return Err("the model predicted no durations".into());
+                        }
+                        // Exact: the untrimmed samples over the frames.
+                        let unit = samples.len() as f64 / frames as f64;
+                        frame_seconds = unit / 24000.0;
+                        let start = joined.as_ref().map_or(0, |a| {
+                            a.samples.len() + crate::paragraph::gap_samples(a.sample_rate)
+                        });
+                        let kept = samples.len().saturating_sub(5000);
+                        let in_chunk: Vec<_> =
+                            crate::kokoro::chunk_tokens(&chunk, offset, &spans, 0)
+                                .into_iter()
+                                .filter_map(|(index, text, chars)| {
+                                    // Token k+1 is spaced character k (the leading pad).
+                                    let tokens: Vec<usize> = sources
+                                        .iter()
+                                        .enumerate()
+                                        .filter(|(_, src)| src.is_some_and(|c| chars.contains(&c)))
+                                        .map(|(k, _)| k + 1)
+                                        .collect();
+                                    Some((index, text, *tokens.first()?..*tokens.last()? + 1))
+                                })
+                                .collect();
+                        words.extend(crate::words_from_durations(
+                            &in_chunk,
+                            &durations,
+                            frame_seconds,
+                            start as f64 / 24000.0,
+                            kept as f64 / 24000.0,
+                        ));
+                    }
                     samples.truncate(samples.len().saturating_sub(5000));
                     samples
                 };
@@ -241,12 +298,60 @@ impl CompactEnglish {
                 )
                 .map_err(std::io::Error::other)?;
             }
-            joined.ok_or_else(|| "no audio".into())
+            let audio = joined.ok_or("no audio")?;
+            Ok((audio, crate::merge_split_words(words), frame_seconds))
         };
         let mut run = run;
         run().map_err(|e| Error(e.to_string()))
     }
 }
+impl TimedSynthesizer for CompactEnglish {
+    /// Kitten's own `duration` output; Inflect answers "timing not
+    /// supported" (its durations are only exposed already expanded).
+    fn synthesize_timed(&mut self, request: &SynthesisRequest<'_>) -> Result<TimedAudio, Error> {
+        let (audio, words, frame_seconds) = self.run(request, &AtomicBool::new(false), true)?;
+        Ok(TimedAudio {
+            audio,
+            words,
+            frame_seconds,
+        })
+    }
+}
+/// [`kitten_spacing`], and for each character of its answer the index of
+/// the input character it is (None for an inserted space).
+fn kitten_spacing_mapped(phones: &str) -> (String, Vec<Option<usize>>) {
+    let mut out = String::new();
+    let mut map = Vec::new();
+    let mut word: Vec<(char, usize)> = Vec::new();
+    let mut pieces: Vec<Vec<(char, usize)>> = Vec::new();
+    for (i, c) in phones.chars().enumerate() {
+        if c.is_alphanumeric() || c == '_' {
+            word.push((c, i));
+        } else {
+            if !word.is_empty() {
+                pieces.push(std::mem::take(&mut word));
+            }
+            if !c.is_whitespace() {
+                pieces.push(vec![(c, i)]);
+            }
+        }
+    }
+    if !word.is_empty() {
+        pieces.push(word);
+    }
+    for (k, piece) in pieces.iter().enumerate() {
+        if k > 0 {
+            out.push(' ');
+            map.push(None);
+        }
+        for &(c, i) in piece {
+            out.push(c);
+            map.push(Some(i));
+        }
+    }
+    (out, map)
+}
+#[cfg(test)]
 fn kitten_spacing(phones: &str) -> String {
     let mut words = Vec::new();
     let mut word = String::new();
@@ -279,5 +384,26 @@ mod tests {
     #[test]
     fn stress_spacing_follows_kitten_contract() {
         assert_eq!(kitten_spacing("həlˈoʊ, wˈɜːld!"), "həlˈoʊ , wˈɜːld !");
+    }
+    #[test]
+    fn kitten_spacing_mapped_is_kitten_spacing_with_sources() {
+        for phones in [
+            "həlˈoʊ, wˈɜːld!",
+            "ðə  kˈæt",
+            "a",
+            " x,y ",
+            "fˈɔːɹɾi nˈaɪn dˈɑːləɹz.",
+        ] {
+            let (spaced, map) = kitten_spacing_mapped(phones);
+            assert_eq!(spaced, kitten_spacing(phones), "{phones}");
+            assert_eq!(map.len(), spaced.chars().count());
+            let input: Vec<char> = phones.chars().collect();
+            for (c, src) in spaced.chars().zip(&map) {
+                match src {
+                    Some(i) => assert_eq!(input[*i], c),
+                    None => assert_eq!(c, ' '),
+                }
+            }
+        }
     }
 }
